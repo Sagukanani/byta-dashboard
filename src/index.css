@@ -1,0 +1,328 @@
+﻿@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+/* =========================
+   THEME VARIABLES
+========================= */
+:root{
+  --bg-1: #050b1d;
+  --bg-2: #0a1430;
+
+  --card-bg: rgba(255,255,255,0.06);
+  --card-border: rgba(255,255,255,0.08);
+
+  --text-main: #ffffff;
+  --text-muted: #9aa4bf;
+
+  --purple-1: #7c3aed;
+  --purple-2: #5b21b6;
+
+  --blue-1: #38bdf8;
+  --blue-2: #2563eb;
+
+  --green-1: #22c55e;
+  --green-2: #16a34a;
+}
+
+/* =========================
+   BASE
+========================= */
+html,body,#root{
+  height:100%;
+}
+
+body{
+  margin:0;
+  background:
+    radial-gradient(900px 500px at 15% -10%, rgba(124,58,237,0.25), transparent 40%),
+    radial-gradient(800px 400px at 85% 10%, rgba(56,189,248,0.18), transparent 45%),
+    linear-gradient(180deg,var(--bg-1),var(--bg-2));
+  color: var(--text-main);
+  font-family: Inter, system-ui, -apple-system, Segoe UI, Roboto, Arial;
+}
+
+/* =========================
+   LAYOUT
+========================= */
+.main-container{
+  max-width: 1200px;
+  margin: 0 auto;
+  padding: 36px 22px;
+}
+
+/* =========================
+   HEADINGS
+========================= */
+h1{
+  font-size: 2.4rem;
+  font-weight: 900;
+  letter-spacing: -0.03em;
+}
+
+h2{
+  font-size: 1.5rem;
+  font-weight: 800;
+}
+
+/* =========================
+   CARDS
+========================= */
+.card{
+  background:
+    linear-gradient(180deg, rgba(255,255,255,0.08), rgba(255,255,255,0.03));
+  border: 1px solid var(--card-border);
+  border-radius: 18px;
+  padding: 20px;
+  box-shadow:
+    0 30px 60px rgba(2,6,23,0.85),
+    inset 0 1px 0 rgba(255,255,255,0.05);
+  backdrop-filter: blur(8px);
+  transition: transform .2s ease, box-shadow .2s ease;
+}
+
+.card:hover{
+  transform: translateY(-4px);
+  box-shadow:
+    0 40px 80px rgba(2,6,23,0.95),
+    inset 0 1px 0 rgba(255,255,255,0.08);
+}
+
+/* Important cards */
+.card.hero{
+  background: linear-gradient(135deg, var(--purple-1), var(--purple-2));
+  border: none;
+}
+
+/* =========================
+   STAT GRID
+========================= */
+.stat-grid{
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(260px,1fr));
+  gap: 22px;
+  margin-top: 24px;
+}
+
+/* =========================
+   TEXT HELPERS
+========================= */
+.label{
+  font-size: 0.75rem;
+  letter-spacing: .08em;
+  text-transform: uppercase;
+  color: var(--text-muted);
+  margin-bottom: 6px;
+}
+
+.value{
+  font-size: 1.55rem;
+  font-weight: 800;
+}
+
+.sub-value{
+  margin-top: 6px;
+  font-size: 0.82rem;
+  color: var(--text-muted);
+}
+
+/* =========================
+   ACCENT COLORS
+========================= */
+.accent-purple{
+  background: linear-gradient(90deg,var(--purple-1),var(--purple-2));
+  -webkit-background-clip: text;
+  -webkit-text-fill-color: transparent;
+}
+
+.accent-blue{
+  background: linear-gradient(90deg,var(--blue-1),var(--blue-2));
+  -webkit-background-clip: text;
+  -webkit-text-fill-color: transparent;
+}
+
+.accent-green{
+  background: linear-gradient(90deg,var(--green-1),var(--green-2));
+  -webkit-background-clip: text;
+  -webkit-text-fill-color: transparent;
+}
+
+/* =========================
+   BUTTONS
+========================= */
+button{
+  font-family: inherit;
+}
+
+.btn{
+  padding: 11px 22px;
+  border-radius: 12px;
+  font-weight: 800;
+  cursor: pointer;
+  border: none;
+  transition: transform .15s ease, box-shadow .15s ease, opacity .15s ease;
+}
+
+.btn-primary{
+  background: linear-gradient(90deg,var(--purple-1),var(--purple-2));
+  color: #fff;
+  box-shadow: 0 14px 30px rgba(124,58,237,0.45);
+}
+
+.btn-secondary{
+  background: linear-gradient(90deg,var(--blue-1),var(--blue-2));
+  color: #fff;
+}
+
+.btn-copy{
+  margin-top: 8px;
+  background: linear-gradient(90deg,var(--blue-1),var(--purple-1));
+  color: #fff;
+}
+
+.btn:hover{
+  transform: translateY(-2px) scale(1.03);
+  opacity: 0.96;
+}
+
+/* =========================
+   INPUTS
+========================= */
+input{
+  background: rgba(255,255,255,0.08);
+  border: 1px solid rgba(255,255,255,0.15);
+  border-radius: 12px;
+  padding: 12px 14px;
+  color: #fff;
+}
+
+input::placeholder{
+  color: var(--text-muted);
+}
+
+/* =========================
+   SECTION SPACING
+========================= */
+.section{
+  margin-top: 36px;
+}
+
+/* =========================
+   MOBILE TWEAKS
+========================= */
+@media (max-width:640px){
+  h1{ font-size: 1.9rem; }
+  .main-container{ padding: 26px 14px; }
+}
+
+/* =========================
+   SIDEBAR
+========================= */
+
+.sidebar {
+  position: fixed;
+  top: 0;
+  left: 0;
+  height: 100vh;
+  width: 72px;
+  background: linear-gradient(
+    180deg,
+    rgba(124,58,237,0.25),
+    rgba(15,23,42,0.95)
+  );
+  backdrop-filter: blur(10px);
+  border-right: 1px solid rgba(255,255,255,0.08);
+  box-shadow: 8px 0 30px rgba(124,58,237,0.25);
+  transition: width 0.35s ease, box-shadow 0.35s ease;
+  z-index: 50;
+  overflow: hidden;
+}
+
+/* Expand on hover */
+.sidebar:hover {
+  width: 220px;
+  box-shadow: 12px 0 50px rgba(124,58,237,0.45);
+}
+
+/* =========================
+   SIDEBAR ITEMS
+========================= */
+
+.sidebar-item {
+  display: flex;
+  align-items: center;
+  gap: 14px;
+  padding: 14px 18px;
+  color: #c7d2fe;
+  cursor: pointer;
+  position: relative;
+  transition: background 0.25s ease, color 0.25s ease;
+}
+
+.sidebar-item span {
+  white-space: nowrap;
+  opacity: 0;
+  transform: translateX(-10px);
+  transition: opacity 0.25s ease, transform 0.25s ease;
+}
+
+/* Show text when expanded */
+.sidebar:hover .sidebar-item span {
+  opacity: 1;
+  transform: translateX(0);
+}
+
+/* Hover glow */
+.sidebar-item:hover {
+  background: linear-gradient(
+    90deg,
+    rgba(124,58,237,0.25),
+    rgba(56,189,248,0.15)
+  );
+  color: #ffffff;
+}
+
+/* Active indicator line */
+.sidebar-item::before {
+  content: "";
+  position: absolute;
+  left: 0;
+  top: 50%;
+  width: 4px;
+  height: 0;
+  background: linear-gradient(180deg, #7c3aed, #38bdf8);
+  border-radius: 0 4px 4px 0;
+  transform: translateY(-50%);
+  transition: height 0.25s ease;
+}
+
+.sidebar-item:hover::before {
+  height: 60%;
+}
+
+/* =========================
+   ICON GLOW
+========================= */
+
+.sidebar-icon {
+  font-size: 20px;
+  color: #a5b4fc;
+  transition: transform 0.25s ease, color 0.25s ease;
+}
+
+.sidebar-item:hover .sidebar-icon {
+  color: #ffffff;
+  transform: scale(1.15);
+}
+
+/* =========================
+   MOBILE
+========================= */
+@media (max-width: 768px) {
+  .sidebar {
+    width: 60px;
+  }
+  .sidebar:hover {
+    width: 180px;
+  }
+}
