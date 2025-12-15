@@ -23,6 +23,15 @@ function formatNumber(n, d = 2) {
   return num.toFixed(d);
 }
 
+function shortText(text) {
+  if (!text) return "";
+  return text.slice(0, 6) + "..." + text.slice(-4);
+}
+
+function copyText(text) {
+  navigator.clipboard.writeText(text);
+}
+
 export default function Dashboard() {
   const [address, setAddress] = useState("");
   const [loading, setLoading] = useState(true);
@@ -136,10 +145,17 @@ export default function Dashboard() {
       <h1>Dashboard</h1>
 
       <Box title="Wallet">
-        <span className="accent-blue">{address}</span>
+        <span
+          className="accent-blue"
+          style={{ cursor: "pointer", wordBreak: "break-all" }}
+          onClick={() => copyText(address)}
+          title="Click to copy full address"
+        >
+          {shortText(address)}
+        </span>
       </Box>
 
-      {/* TOP GRID (CLAIM FIXED HERE) */}
+      {/* TOP GRID */}
       <div className="stat-grid section">
         <Box title="Token Balance">
           <div className="value accent-purple">
@@ -163,14 +179,11 @@ export default function Dashboard() {
           <div className="value">{TIER_NAMES[data.tier]}</div>
         </Box>
 
-        {/* CLAIM MOVED HERE */}
         <Box title="Claim Rewards">
           <button className="btn btn-primary" onClick={handleClaim}>
             Claim Reward
           </button>
-          {claimStatus && (
-            <div className="sub-value">{claimStatus}</div>
-          )}
+          {claimStatus && <div className="sub-value">{claimStatus}</div>}
         </Box>
       </div>
 
@@ -210,15 +223,29 @@ export default function Dashboard() {
 
         <div style={{ display: "flex", flexDirection: "column", gap: 18 }}>
           <Box title="Left Side">
-            <div className="sub-value">{leftRef}</div>
-            <button className="btn btn-copy" onClick={() => navigator.clipboard.writeText(leftRef)}>
+            <div
+              className="sub-value"
+              style={{ cursor: "pointer", wordBreak: "break-all" }}
+              onClick={() => copyText(leftRef)}
+              title="Click to copy full link"
+            >
+              {shortText(leftRef)}
+            </div>
+            <button className="btn btn-copy" onClick={() => copyText(leftRef)}>
               Copy
             </button>
           </Box>
 
           <Box title="Right Side">
-            <div className="sub-value">{rightRef}</div>
-            <button className="btn btn-copy" onClick={() => navigator.clipboard.writeText(rightRef)}>
+            <div
+              className="sub-value"
+              style={{ cursor: "pointer", wordBreak: "break-all" }}
+              onClick={() => copyText(rightRef)}
+              title="Click to copy full link"
+            >
+              {shortText(rightRef)}
+            </div>
+            <button className="btn btn-copy" onClick={() => copyText(rightRef)}>
               Copy
             </button>
           </Box>
@@ -230,14 +257,10 @@ export default function Dashboard() {
         <h2>Team Volume</h2>
         <div className="stat-grid">
           <Box title="Left">
-            <div className="value">
-              {formatNumber(data.left)} USD
-            </div>
+            <div className="value">{formatNumber(data.left)} USD</div>
           </Box>
           <Box title="Right">
-            <div className="value">
-              {formatNumber(data.right)} USD
-            </div>
+            <div className="value">{formatNumber(data.right)} USD</div>
           </Box>
         </div>
       </div>

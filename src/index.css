@@ -366,3 +366,22 @@ input::placeholder{
     padding-right: 14px;
   }
 }
+/* =========================
+   ADDRESS / LINK SAFETY
+========================= */
+
+.truncate-clickable {
+  display: inline-block;
+  max-width: 100%;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  cursor: pointer;
+}
+
+/* Mobile extra safety */
+@media (max-width:640px){
+  .truncate-clickable{
+    max-width: 100%;
+  }
+}
