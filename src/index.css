@@ -326,3 +326,43 @@ input::placeholder{
     width: 180px;
   }
 }
+/* =========================
+   MOBILE FIXES (ONLY)
+========================= */
+
+@media (max-width:640px){
+
+  /* Prevent value overflow */
+  .value,
+  .sub-value,
+  .label{
+    word-break: break-word;
+    overflow-wrap: anywhere;
+  }
+
+  /* Slightly smaller numbers on mobile */
+  .value{
+    font-size: 1.2rem;
+    line-height: 1.3;
+  }
+
+  .sub-value{
+    font-size: 0.75rem;
+  }
+
+  /* Compact cards */
+  .card{
+    padding: 16px;
+  }
+
+  /* Fix grid spacing on mobile */
+  .stat-grid{
+    gap: 16px;
+  }
+
+  /* Prevent cards touching screen edges */
+  .main-container{
+    padding-left: 14px;
+    padding-right: 14px;
+  }
+}
