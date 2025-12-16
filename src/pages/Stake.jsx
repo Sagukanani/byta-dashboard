@@ -24,12 +24,17 @@ async function ensureReferrer(user) {
 
   const sc = stakingContract();
 
-  const existing = await sc.referrer(user);
-  if (
-    existing &&
-    existing !== "0x0000000000000000000000000000000000000000"
-  ) {
-    return;
+  // 🔒 Mobile wallets safe-guard
+  try {
+    const existing = await sc.referrer(user);
+    if (
+      existing &&
+      existing !== "0x0000000000000000000000000000000000000000"
+    ) {
+      return;
+    }
+  } catch (e) {
+    // ignore decode error (Bitget / mobile issue)
   }
 
   const tx = await sc.setReferrer(ref, side === "left");
