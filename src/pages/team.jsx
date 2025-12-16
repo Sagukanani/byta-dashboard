@@ -1,30 +1,57 @@
 import { useEffect, useState } from "react";
-import { connectWallet, getMyDirectTeam } from "../lib/web3";
+import { connectWallet, getMyFullTeam } from "../lib/web3";
 
 export default function Team() {
   const [loading, setLoading] = useState(true);
   const [team, setTeam] = useState([]);
   const [leftCount, setLeftCount] = useState(0);
   const [rightCount, setRightCount] = useState(0);
+  const [account, setAccount] = useState(null);
 
   useEffect(() => {
-    load();
+    let mounted = true;
+
+    async function init() {
+      try {
+        const addr = await connectWallet();
+        if (!mounted) return;
+
+        setAccount(addr);
+      } catch (e) {
+        console.error(e);
+        setLoading(false);
+      }
+    }
+
+    init();
+
+    return () => {
+      mounted = false;
+    };
   }, []);
 
-  async function load() {
-    try {
-      const addr = await connectWallet();
-      const res = await getMyDirectTeam(addr);
+  useEffect(() => {
+    if (!account) return;
 
-      setTeam(res.team || []);
-      setLeftCount(res.leftCount || 0);
-      setRightCount(res.rightCount || 0);
-    } catch (e) {
-      console.error("TEAM LOAD ERROR:", e);
-    } finally {
+    let mounted = true;
+
+    async function loadTeam() {
+      setLoading(true);
+      const res = await getMyFullTeam(account);
+      if (!mounted) return;
+
+      setTeam(res.team);
+      setLeftCount(res.leftCount);
+      setRightCount(res.rightCount);
       setLoading(false);
     }
-  }
+
+    loadTeam();
+
+    return () => {
+      mounted = false;
+    };
+  }, [account]);
 
   return (
     <div className="main-container">
@@ -34,16 +61,13 @@ export default function Team() {
 
       {!loading && (
         <>
-          {/* SUMMARY */}
           <div className="card">
             <strong>Left:</strong> {leftCount} &nbsp; | &nbsp;
             <strong>Right:</strong> {rightCount}
           </div>
 
-          {/* NO TEAM */}
-          {team.length === 0 && <p>No direct team found.</p>}
+          {team.length === 0 && <p>No team found.</p>}
 
-          {/* TEAM LIST */}
           {team.length > 0 && (
             <div className="card">
               {team.map((m, i) => (
@@ -60,7 +84,7 @@ export default function Team() {
 
                   <div style={{ fontSize: 13, opacity: 0.7 }}>
                     Side: <strong>{m.side}</strong> &nbsp; | &nbsp;
-                    Indirect Team: <strong>{m.indirectCount ?? 0}</strong>
+                    Total Team: <strong>{m.totalCount}</strong>
                   </div>
                 </div>
               ))}

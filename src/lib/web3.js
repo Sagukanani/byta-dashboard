@@ -189,45 +189,59 @@ export async function getReferralIncome(user) {
 
   return formatEther(total);
 }
-export async function getMyDirectTeam(userAddress) {
-  if (!userAddress) {
-    return { team: [], leftCount: 0, rightCount: 0 };
-  }
-
+export async function getMyFullTeam(rootUser) {
   const sc = stakingContract();
   const provider = sc.runner.provider;
 
   const latest = await provider.getBlockNumber();
+  const filter = sc.filters.ReferrerSet();
 
-  // IMPORTANT: always scan from 0 for referral graph
-  const FROM_BLOCK = 0;
-  const TO_BLOCK = latest;
+  const logs = await sc.queryFilter(filter, 0, latest);
 
-  const filter = sc.filters.ReferrerSet(null, userAddress);
+  // Build referral map: referrer => [users]
+  const map = {};
+  const sideMap = {};
 
-  let team = [];
+  for (const log of logs) {
+    const user = log.args.user;
+    const ref = log.args.referrer;
 
-  try {
-    const logs = await sc.queryFilter(filter, FROM_BLOCK, TO_BLOCK);
+    if (!map[ref]) map[ref] = [];
+    map[ref].push(user);
 
-    for (const log of logs) {
-      team.push({
-        wallet: log.args.user,
-        side: log.args.isLeft ? "Left" : "Right",
-        txHash: log.transactionHash,
-      });
-    }
-  } catch (e) {
-    console.error("Team fetch failed:", e);
+    sideMap[`${ref}_${user}`] = log.args.isLeft ? "Left" : "Right";
   }
 
-  const leftCount = team.filter(t => t.side === "Left").length;
-  const rightCount = team.filter(t => t.side === "Right").length;
+  // DFS to count total team
+  function countAll(user) {
+    if (!map[user]) return 0;
+    let total = map[user].length;
+    for (const u of map[user]) {
+      total += countAll(u);
+    }
+    return total;
+  }
+
+  const direct = map[rootUser] || [];
+
+  const team = direct.map(user => ({
+    wallet: user,
+    side: sideMap[`${rootUser}_${user}`],
+    totalCount: countAll(user)
+  }));
+
+  const leftCount = team
+    .filter(t => t.side === "Left")
+    .reduce((a, b) => a + b.totalCount + 1, 0);
+
+  const rightCount = team
+    .filter(t => t.side === "Right")
+    .reduce((a, b) => a + b.totalCount + 1, 0);
 
   return {
     team,
     leftCount,
-    rightCount,
+    rightCount
   };
 }
 
