@@ -193,63 +193,63 @@ export async function getMyFullTeam(rootUser) {
   const provider = new JsonRpcProvider(import.meta.env.VITE_RPC_URL);
   const sc = new Contract(STAKING_ADDRESS, STAKING_ABI, provider);
 
-  const latest = await provider.getBlockNumber();
-
-  const DEPLOY_BLOCK = 71259939;
-  const CHUNK = 20000;
-
-  // 🔴 THIS IS THE FIX
-  const filter = sc.filters.ReferrerSet(undefined, rootUser);
-
-  let logs = [];
-
-  for (let from = DEPLOY_BLOCK; from <= latest; from += CHUNK) {
-    const to = Math.min(from + CHUNK - 1, latest);
-    try {
-      const part = await sc.queryFilter(filter, from, to);
-      logs.push(...part);
-    } catch (e) {
-      console.warn("Team skip blocks", from, to);
-    }
+  // -----------------------------
+  // STEP 1: get ALL direct users
+  // -----------------------------
+  // ⚠️ This requires a view function in contract
+  // Example: getDirectReferrals(address) returns (address[])
+  let directUsers = [];
+  try {
+    directUsers = await sc.getDirectReferrals(rootUser);
+  } catch (e) {
+    console.error("getDirectReferrals not available in contract");
+    return { team: [], leftCount: 0, rightCount: 0 };
   }
 
-  const map = {};
-  const sideMap = {};
+  // -----------------------------
+  // STEP 2: count full tree per direct user
+  // -----------------------------
+  async function countAllDownline(user) {
+    let total = 0;
+    let stack = [user];
 
-  for (const log of logs) {
-    const user = log.args.user;
-    const ref = log.args.referrer;
+    while (stack.length) {
+      const current = stack.pop();
+      let children = [];
 
-    if (!map[ref]) map[ref] = [];
-    map[ref].push(user);
+      try {
+        children = await sc.getDirectReferrals(current);
+      } catch {
+        children = [];
+      }
 
-    sideMap[`${ref}_${user}`] = log.args.isLeft ? "Left" : "Right";
-  }
-
-  function countAll(user) {
-    if (!map[user]) return 0;
-    let total = map[user].length;
-    for (const u of map[user]) {
-      total += countAll(u);
+      total += children.length;
+      stack.push(...children);
     }
+
     return total;
   }
 
-  const direct = map[rootUser] || [];
+  const team = [];
 
-  const team = direct.map(user => ({
-    wallet: user,
-    side: sideMap[`${rootUser}_${user}`],
-    totalCount: countAll(user),
-  }));
+  let leftCount = 0;
+  let rightCount = 0;
 
-  const leftCount = team
-    .filter(t => t.side === "Left")
-    .reduce((a, b) => a + b.totalCount + 1, 0);
+  for (const user of directUsers) {
+    const info = await sc.users(user); // or referrerOf mapping
+    const side = info.isLeft ? "Left" : "Right";
 
-  const rightCount = team
-    .filter(t => t.side === "Right")
-    .reduce((a, b) => a + b.totalCount + 1, 0);
+    const totalCount = await countAllDownline(user);
+
+    team.push({
+      wallet: user,
+      side,
+      totalCount
+    });
+
+    if (side === "Left") leftCount += totalCount + 1;
+    else rightCount += totalCount + 1;
+  }
 
   return { team, leftCount, rightCount };
 }
