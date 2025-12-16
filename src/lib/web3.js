@@ -199,8 +199,8 @@ export async function getMyDirectTeam(userAddress) {
 
   const latest = await provider.getBlockNumber();
 
-  // ⚠️ NEVER 0, NEVER "latest" alone
-  const FROM_BLOCK = latest - 3000 > 0 ? latest - 3000 : 0;
+  // IMPORTANT: always scan from 0 for referral graph
+  const FROM_BLOCK = 0;
   const TO_BLOCK = latest;
 
   const filter = sc.filters.ReferrerSet(null, userAddress);

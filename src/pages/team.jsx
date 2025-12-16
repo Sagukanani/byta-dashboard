@@ -34,18 +34,34 @@ export default function Team() {
 
       {!loading && (
         <>
+          {/* SUMMARY */}
           <div className="card">
             <strong>Left:</strong> {leftCount} &nbsp; | &nbsp;
             <strong>Right:</strong> {rightCount}
           </div>
 
+          {/* NO TEAM */}
           {team.length === 0 && <p>No direct team found.</p>}
 
+          {/* TEAM LIST */}
           {team.length > 0 && (
             <div className="card">
               {team.map((m, i) => (
-                <div key={i}>
-                  {m.wallet} — {m.side}
+                <div
+                  key={i}
+                  style={{
+                    padding: "10px 0",
+                    borderBottom: "1px solid rgba(255,255,255,0.08)"
+                  }}
+                >
+                  <div className="sub-value">
+                    <strong>Wallet:</strong> {m.wallet}
+                  </div>
+
+                  <div style={{ fontSize: 13, opacity: 0.7 }}>
+                    Side: <strong>{m.side}</strong> &nbsp; | &nbsp;
+                    Indirect Team: <strong>{m.indirectCount ?? 0}</strong>
+                  </div>
                 </div>
               ))}
             </div>
