@@ -199,7 +199,7 @@ export async function getMyFullTeam(rootUser) {
   const CHUNK = 20000;
 
   // 🔴 THIS IS THE FIX
-  const filter = sc.filters.ReferrerSet(null, rootUser);
+  const filter = sc.filters.ReferrerSet(undefined, rootUser);
 
   let logs = [];
 
