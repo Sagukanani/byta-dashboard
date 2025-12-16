@@ -194,11 +194,23 @@ export async function getMyFullTeam(rootUser) {
   const provider = sc.runner.provider;
 
   const latest = await provider.getBlockNumber();
+
+  const CHUNK = 90000; // < 100k (safe)
   const filter = sc.filters.ReferrerSet();
 
-  const logs = await sc.queryFilter(filter, 0, latest);
+  let logs = [];
 
-  // Build referral map: referrer => [users]
+  for (let from = 0; from <= latest; from += CHUNK) {
+    const to = Math.min(from + CHUNK - 1, latest);
+    try {
+      const part = await sc.queryFilter(filter, from, to);
+      logs.push(...part);
+    } catch (e) {
+      console.warn("Team skip blocks", from, to);
+    }
+  }
+
+  // Build referral map
   const map = {};
   const sideMap = {};
 
@@ -212,7 +224,6 @@ export async function getMyFullTeam(rootUser) {
     sideMap[`${ref}_${user}`] = log.args.isLeft ? "Left" : "Right";
   }
 
-  // DFS to count total team
   function countAll(user) {
     if (!map[user]) return 0;
     let total = map[user].length;
@@ -227,7 +238,7 @@ export async function getMyFullTeam(rootUser) {
   const team = direct.map(user => ({
     wallet: user,
     side: sideMap[`${rootUser}_${user}`],
-    totalCount: countAll(user)
+    totalCount: countAll(user),
   }));
 
   const leftCount = team
@@ -238,11 +249,7 @@ export async function getMyFullTeam(rootUser) {
     .filter(t => t.side === "Right")
     .reduce((a, b) => a + b.totalCount + 1, 0);
 
-  return {
-    team,
-    leftCount,
-    rightCount
-  };
+  return { team, leftCount, rightCount };
 }
 
 /* ---------------- REAL PENDING REWARDS (ON-CHAIN) ---------------- */
