@@ -190,15 +190,16 @@ export async function getReferralIncome(user) {
   return formatEther(total);
 }
 export async function getMyFullTeam(rootUser) {
-  // ✅ Dedicated RPC (Alchemy), NOT MetaMask
   const provider = new JsonRpcProvider(import.meta.env.VITE_RPC_URL);
   const sc = new Contract(STAKING_ADDRESS, STAKING_ABI, provider);
 
   const latest = await provider.getBlockNumber();
 
-  const DEPLOY_BLOCK = 71259939; // 🔴 YOUR CONTRACT DEPLOYMENT BLOCK
-  const CHUNK = 20000; // public RPC safe
-  const filter = sc.filters.ReferrerSet();
+  const DEPLOY_BLOCK = 71259939;
+  const CHUNK = 20000;
+
+  // 🔴 THIS IS THE FIX
+  const filter = sc.filters.ReferrerSet(null, rootUser);
 
   let logs = [];
 
@@ -211,8 +212,6 @@ export async function getMyFullTeam(rootUser) {
       console.warn("Team skip blocks", from, to);
     }
   }
-
-  // ---------------- BUILD REFERRAL GRAPH ----------------
 
   const map = {};
   const sideMap = {};
@@ -227,7 +226,6 @@ export async function getMyFullTeam(rootUser) {
     sideMap[`${ref}_${user}`] = log.args.isLeft ? "Left" : "Right";
   }
 
-  // DFS to count full downline
   function countAll(user) {
     if (!map[user]) return 0;
     let total = map[user].length;
