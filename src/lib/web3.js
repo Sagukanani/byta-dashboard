@@ -190,12 +190,13 @@ export async function getReferralIncome(user) {
   return formatEther(total);
 }
 export async function getMyFullTeam(rootUser) {
-  const sc = stakingContract();
-  const provider = sc.runner.provider;
+  // ❗ Dedicated RPC, NOT MetaMask
+  const provider = new JsonRpcProvider(import.meta.env.VITE_RPC_URL);
+  const sc = new Contract(STAKING_ADDRESS, STAKING_ABI, provider);
 
   const latest = await provider.getBlockNumber();
 
-  const CHUNK = 90000; // < 100k (safe)
+  const CHUNK = 20000; // public RPC safe
   const filter = sc.filters.ReferrerSet();
 
   let logs = [];
