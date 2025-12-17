@@ -1,7 +1,7 @@
 import { useEffect, useState } from "react";
 import { connectWallet } from "../lib/web3";
 
-const INDEXER_API = "http://localhost:4000"; // prod me env se lena
+const INDEXER_API = "https://byta-indexer.onrender.com";
 
 export default function Team() {
   const [loading, setLoading] = useState(true);
