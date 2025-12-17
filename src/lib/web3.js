@@ -1,4 +1,3 @@
-// src/lib/web3.js
 import {
   BrowserProvider,
   JsonRpcProvider,
@@ -54,7 +53,7 @@ export async function getUserDashboardData(user) {
     stakedAmount: formatEther(stakeInfo.amount),
     left: formatEther(leftVol),
     right: formatEther(rightVol),
-    tier: Number(tier),
+    tier: Number(tier)
   };
 }
 
@@ -86,15 +85,15 @@ export async function claimReward() {
   return tx.hash;
 }
 
-/* ---------------- CLAIM HISTORY (SAFE + WORKING) ---------------- */
+/* ---------------- CLAIM HISTORY ---------------- */
 
 export async function getClaimHistory(user) {
   const sc = stakingContract();
   const provider = sc.runner.provider;
 
   const latest = await provider.getBlockNumber();
-  const START = Math.max(latest - 20000, 0); // ~1 day BSC
-  const CHUNK = 800; // < 1000 logs limit
+  const START = Math.max(latest - 20000, 0);
+  const CHUNK = 800;
 
   const filter = sc.filters.RewardPaid(user);
 
@@ -102,48 +101,35 @@ export async function getClaimHistory(user) {
 
   for (let from = START; from <= latest; from += CHUNK) {
     const to = Math.min(from + CHUNK - 1, latest);
-
     try {
       const part = await sc.queryFilter(filter, from, to);
       logs.push(...part);
-    } catch (e) {
-      console.warn("Skipped blocks", from, to);
+    } catch {
+      // skip
     }
   }
 
   return logs
     .sort((a, b) => b.blockNumber - a.blockNumber)
     .slice(0, 20)
-    .map((log) => ({
+    .map(log => ({
       amount: formatUnits(log.args.tokenAmount, 18),
       usd: formatUnits(log.args.usdAmount, 18),
       txHash: log.transactionHash,
-      type: "Staking Reward",
+      type: "Staking Reward"
     }));
 }
 
-/* ---------------- RPC TEST ---------------- */
+/* ---------------- PENDING STAKING REWARD ---------------- */
 
-export async function testConnection() {
-  try {
-    const rpc = new JsonRpcProvider(import.meta.env.VITE_RPC_URL);
-    const block = await rpc.getBlockNumber();
-    return "Connected. Latest block: " + block;
-  } catch (err) {
-    return "Connection failed: " + err.message;
-  }
-}
-// ---------------------
-// STAKING PENDING REWARD (REAL, NOT EVENT BASED)
-// ---------------------
 export async function getStakingPendingReward(user) {
   const sc = stakingContract();
 
   const stake = await sc.stakes(user);
   if (stake.amount === 0n) return "0";
 
-  const rewardBP = await sc.rewardPerPeriodBP(); // basis points
-  const rewardPeriod = await sc.rewardPeriod(); // seconds
+  const rewardBP = await sc.rewardPerPeriodBP();
+  const rewardPeriod = await sc.rewardPeriod();
 
   const lastClaim = Number(stake.lastClaim);
   if (lastClaim === 0) return "0";
@@ -154,15 +140,14 @@ export async function getStakingPendingReward(user) {
 
   const periods = Math.floor(elapsed / Number(rewardPeriod));
 
-  // reward = amount * bp * periods / 10000
   const rewardWei =
     (stake.amount * BigInt(rewardBP) * BigInt(periods)) / 10000n;
 
   return formatEther(rewardWei);
 }
-// ---------------------
-// REFERRAL INCOME (LAST 20, SAFE)
-// ---------------------
+
+/* ---------------- REFERRAL INCOME ---------------- */
+
 export async function getReferralIncome(user) {
   const sc = stakingContract();
   const provider = sc.runner.provider;
@@ -182,90 +167,35 @@ export async function getReferralIncome(user) {
       for (const log of logs) {
         total += log.args.tokenAmount;
       }
-    } catch (e) {
-      console.warn("Referral skip", from, to);
+    } catch {
+      // skip
     }
   }
 
   return formatEther(total);
 }
-export async function getMyFullTeam(rootUser) {
-  const provider = new JsonRpcProvider(import.meta.env.VITE_RPC_URL);
-  const sc = new Contract(STAKING_ADDRESS, STAKING_ABI, provider);
 
-  // -----------------------------
-  // STEP 1: get ALL direct users
-  // -----------------------------
-  // ⚠️ This requires a view function in contract
-  // Example: getDirectReferrals(address) returns (address[])
-  let directUsers = [];
-  try {
-    directUsers = await sc.getDirectReferrals(rootUser);
-  } catch (e) {
-    console.error("getDirectReferrals not available in contract");
-    return { team: [], leftCount: 0, rightCount: 0 };
-  }
+/* ---------------- TEAM (INDEXER BASED – FINAL) ---------------- */
 
-  // -----------------------------
-  // STEP 2: count full tree per direct user
-  // -----------------------------
-  async function countAllDownline(user) {
-    let total = 0;
-    let stack = [user];
-
-    while (stack.length) {
-      const current = stack.pop();
-      let children = [];
-
-      try {
-        children = await sc.getDirectReferrals(current);
-      } catch {
-        children = [];
-      }
-
-      total += children.length;
-      stack.push(...children);
-    }
-
-    return total;
-  }
-
-  const team = [];
-
-  let leftCount = 0;
-  let rightCount = 0;
-
-  for (const user of directUsers) {
-    const info = await sc.users(user); // or referrerOf mapping
-    const side = info.isLeft ? "Left" : "Right";
-
-    const totalCount = await countAllDownline(user);
-
-    team.push({
-      wallet: user,
-      side,
-      totalCount
-    });
-
-    if (side === "Left") leftCount += totalCount + 1;
-    else rightCount += totalCount + 1;
-  }
-
-  return { team, leftCount, rightCount };
+export async function getTeamFromIndexer(user) {
+  const res = await fetch(
+    `${import.meta.env.VITE_INDEXER_API}/team/${user.toLowerCase()}`
+  );
+  return res.json();
 }
 
-/* ---------------- REAL PENDING REWARDS (ON-CHAIN) ---------------- */
+/* ---------------- PENDING REWARDS (USD) ---------------- */
 
 export async function getPendingStakingRewardUSD(user) {
   const sc = stakingContract();
   const usdWei = await sc.pendingStakingRewardUSD(user);
-  return formatEther(usdWei); // USD (18 decimals)
+  return formatEther(usdWei);
 }
 
 export async function getPendingBytaDailyUSD(user) {
   const sc = stakingContract();
   const usdWei = await sc.pendingBytaDailyUSD(user);
-  return formatEther(usdWei); // USD (18 decimals)
+  return formatEther(usdWei);
 }
 
 export async function getPendingRewardsToken(user) {
