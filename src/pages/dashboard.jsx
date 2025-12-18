@@ -63,44 +63,52 @@ export default function Dashboard() {
   }, [walletConnected, address]);
 
   async function load(user) {
-    try {
-      setLoading(true);
+  try {
+    setLoading(true);
 
-      const dashboard = await getUserDashboardData(user);
-      setData(dashboard);
+    // ⚡ PARALLEL CALLS (MAIN FIX)
+    const [
+      dashboard,
+      bal,
+      usdPrice,
+      stakingUsdVal,
+      bytaUsdVal,
+      totalToken,
+      ref
+    ] = await Promise.all([
+      getUserDashboardData(user),
+      getTokenBalance(user),
+      getTokenUsdValue("1"),
+      getPendingStakingRewardUSD(user),
+      getPendingBytaDailyUSD(user),
+      getPendingRewardsToken(user),
+      getReferralIncome(user)
+    ]);
 
-      const bal = await getTokenBalance(user);
-      setTokenBalance(bal);
+    setData(dashboard);
+    setTokenBalance(bal);
+    setTokenUsdValue(usdPrice);
+    setReferralIncome(ref);
 
-      const usdPrice = await getTokenUsdValue("1");
-      setTokenUsdValue(usdPrice);
+    setStakingUsd(stakingUsdVal);
+    setBytaDailyUsd(bytaUsdVal);
+    setTotalRewardToken(totalToken);
 
-      const ref = await getReferralIncome(user);
-      setReferralIncome(ref);
+    const price = Number(usdPrice) || 0;
 
-      const stakingUsdVal = await getPendingStakingRewardUSD(user);
-      const bytaUsdVal = await getPendingBytaDailyUSD(user);
-      const totalToken = await getPendingRewardsToken(user);
+    setStakingByta(price ? stakingUsdVal / price : 0);
+    setBytaDailyByta(price ? bytaUsdVal / price : 0);
+    setTotalRewardUsd(Number(stakingUsdVal) + Number(bytaUsdVal));
 
-      setStakingUsd(stakingUsdVal);
-      setBytaDailyUsd(bytaUsdVal);
-      setTotalRewardToken(totalToken);
+    setTokenBalanceUsd(Number(bal) * price);
+    setStakedUsd(Number(dashboard.stakedAmount) * price);
 
-      const price = Number(usdPrice) || 0;
-
-      setStakingByta(price ? stakingUsdVal / price : 0);
-      setBytaDailyByta(price ? bytaUsdVal / price : 0);
-      setTotalRewardUsd(Number(stakingUsdVal) + Number(bytaUsdVal));
-
-      setTokenBalanceUsd(Number(bal) * price);
-      setStakedUsd(Number(dashboard.stakedAmount) * price);
-
-    } catch (err) {
-      console.error("Dashboard load error:", err);
-    } finally {
-      setLoading(false);
-    }
+  } catch (err) {
+    console.error("Dashboard load error:", err);
+  } finally {
+    setLoading(false);
   }
+}
 
   async function handleClaim() {
     try {
