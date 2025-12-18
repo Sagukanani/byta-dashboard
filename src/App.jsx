@@ -10,6 +10,9 @@ export default function App() {
   const [sidebarOpen, setSidebarOpen] = useState(false);
   const [page, setPage] = useState("dashboard");
 
+  // 🔴 IMPORTANT
+  const [wallet, setWallet] = useState(null);
+
   function handleNavigate(p) {
     setPage(p);
     setSidebarOpen(false);
@@ -17,8 +20,6 @@ export default function App() {
 
   return (
     <div style={{ minHeight: "100vh", background: "#0B1220", color: "#fff" }}>
-      
-      {/* HAMBURGER */}
       {!sidebarOpen && (
         <button
           onClick={() => setSidebarOpen(true)}
@@ -34,25 +35,22 @@ export default function App() {
             zIndex: 20
           }}
         >
-          <div style={{ width: 22, height: 3, background: "#fff", marginBottom: 4 }}></div>
-          <div style={{ width: 22, height: 3, background: "#fff", marginBottom: 4 }}></div>
-          <div style={{ width: 22, height: 3, background: "#fff" }}></div>
+          <div style={{ width: 22, height: 3, background: "#fff", marginBottom: 4 }} />
+          <div style={{ width: 22, height: 3, background: "#fff", marginBottom: 4 }} />
+          <div style={{ width: 22, height: 3, background: "#fff" }} />
         </button>
       )}
 
-      {/* SIDEBAR PANEL */}
       {sidebarOpen && (
-        <div
-          style={{
-            position: "fixed",
-            top: 0,
-            left: 0,
-            height: "100%",
-            width: 260,
-            background: "#071122",
-            zIndex: 30,
-          }}
-        >
+        <div style={{
+          position: "fixed",
+          top: 0,
+          left: 0,
+          height: "100%",
+          width: 260,
+          background: "#071122",
+          zIndex: 30,
+        }}>
           <Sidebar
             onClose={() => setSidebarOpen(false)}
             onNavigate={handleNavigate}
@@ -60,7 +58,6 @@ export default function App() {
         </div>
       )}
 
-      {/* BACKDROP */}
       {sidebarOpen && (
         <div
           onClick={() => setSidebarOpen(false)}
@@ -70,15 +67,14 @@ export default function App() {
             background: "rgba(0,0,0,0.45)",
             zIndex: 20,
           }}
-        ></div>
+        />
       )}
 
-      {/* MAIN CONTENT AREA */}
       <div style={{ padding: "80px 20px" }}>
-        {page === "dashboard" && <Dashboard />}
-        {page === "stake" && <Stake />}
-        {page === "team" && <Team />}
-        {page === "buysell" && <BuySell />}
+        {page === "dashboard" && <Dashboard wallet={wallet} setWallet={setWallet} />}
+        {page === "stake" && <Stake wallet={wallet} />}
+        {page === "team" && <Team wallet={wallet} />}
+        {page === "buysell" && <BuySell wallet={wallet} />}
       </div>
     </div>
   );
