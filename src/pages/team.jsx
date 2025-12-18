@@ -1,7 +1,10 @@
 import { useEffect, useState } from "react";
 import { connectWallet } from "../lib/web3";
 
-const INDEXER_API = "https://byta-indexer.onrender.com";
+// ✅ env first, fallback second
+const INDEXER_API =
+  import.meta.env.VITE_INDEXER_API ||
+  "https://byta-indexer-api.onrender.com";
 
 export default function Team() {
   const [loading, setLoading] = useState(true);
@@ -20,10 +23,10 @@ export default function Team() {
       try {
         const addr = await connectWallet();
         if (!mounted) return;
-        setAccount(addr);
+        setAccount(addr.toLowerCase()); // ✅ normalize once
       } catch (e) {
-        console.error(e);
-        setLoading(false);
+        console.error("Wallet connect failed", e);
+        if (mounted) setLoading(false);
       }
     }
 
@@ -44,20 +47,27 @@ export default function Team() {
       try {
         setLoading(true);
 
-        const res = await fetch(
-          `${INDEXER_API}/team/${account.toLowerCase()}`
-        );
-        const data = await res.json();
+        const res = await fetch(`${INDEXER_API}/team/${account}`);
 
+        if (!res.ok) {
+          throw new Error("Indexer API error");
+        }
+
+        const data = await res.json();
         if (!mounted) return;
 
-        // 👇 API structure FIX
-        setTeam(data.team || []);
-        setLeftCount(data.leftCount || 0);
-        setRightCount(data.rightCount || 0);
-        setTotalTeam(data.totalTeam || 0);
+        setTeam(data.team ?? []);
+        setLeftCount(data.leftCount ?? 0);
+        setRightCount(data.rightCount ?? 0);
+        setTotalTeam(data.totalTeam ?? 0);
       } catch (e) {
         console.error("Team load failed", e);
+        if (mounted) {
+          setTeam([]);
+          setLeftCount(0);
+          setRightCount(0);
+          setTotalTeam(0);
+        }
       } finally {
         if (mounted) setLoading(false);
       }

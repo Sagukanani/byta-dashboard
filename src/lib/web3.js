@@ -177,12 +177,22 @@ export async function getReferralIncome(user) {
 
 /* ---------------- TEAM (INDEXER BASED – FINAL) ---------------- */
 
+const INDEXER_API =
+  import.meta.env.VITE_INDEXER_API ||
+  "https://byta-indexer-api.onrender.com";
+
 export async function getTeamFromIndexer(user) {
   const res = await fetch(
-    `${import.meta.env.VITE_INDEXER_API}/team/${user.toLowerCase()}`
+    `${INDEXER_API}/team/${user.toLowerCase()}`
   );
+
+  if (!res.ok) {
+    throw new Error("Indexer API failed");
+  }
+
   return res.json();
 }
+
 
 /* ---------------- PENDING REWARDS (USD) ---------------- */
 
