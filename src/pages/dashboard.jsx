@@ -61,16 +61,17 @@ export default function Dashboard() {
 
   const [referralIncome, setReferralIncome] = useState("0");
 
-  useEffect(() => {
-    load();
-  }, []);
+  // useEffect(() => {
+//   load();
+// }, []);
+
 
   async function load() {
     try {
       setLoading(true);
 
       const user = await connectWallet();
-      setAddress(user);
+      setAddress(user.toLowerCase());
 
       const dashboard = await getUserDashboardData(user);
       setData(dashboard);
@@ -132,9 +133,10 @@ export default function Dashboard() {
     7: "BYTA-7",
   };
 
-  if (loading) {
-    return <div className="main-container">Loading dashboard…</div>;
-  }
+  if (loading && address) {
+  return <div className="main-container">Loading dashboard…</div>;
+}
+
 
   const baseUrl = window.location.origin;
   const leftRef = `${baseUrl}/?ref=${address}&side=left`;
@@ -142,6 +144,16 @@ export default function Dashboard() {
 
   return (
     <div className="main-container">
+      {!address && (
+  <button
+    className="btn btn-primary"
+    onClick={load}
+    style={{ marginBottom: 20 }}
+  >
+    Connect Wallet
+  </button>
+)}
+
       <h1>Dashboard</h1>
 
       <Box title="Wallet">
