@@ -63,52 +63,53 @@ export default function Dashboard() {
   }, [walletConnected, address]);
 
   async function load(user) {
-  try {
-    setLoading(true);
+    try {
+      setLoading(true);
 
-    // ⚡ PARALLEL CALLS (MAIN FIX)
-    const [
-      dashboard,
-      bal,
-      usdPrice,
-      stakingUsdVal,
-      bytaUsdVal,
-      totalToken,
-      ref
-    ] = await Promise.all([
-      getUserDashboardData(user),
-      getTokenBalance(user),
-      getTokenUsdValue("1"),
-      getPendingStakingRewardUSD(user),
-      getPendingBytaDailyUSD(user),
-      getPendingRewardsToken(user),
-      getReferralIncome(user)
-    ]);
+      /* ---------- FAST DATA (UI FIRST) ---------- */
+      const [dashboard, bal, usdPrice] = await Promise.all([
+        getUserDashboardData(user),
+        getTokenBalance(user),
+        getTokenUsdValue("1")
+      ]);
 
-    setData(dashboard);
-    setTokenBalance(bal);
-    setTokenUsdValue(usdPrice);
-    setReferralIncome(ref);
+      setData(dashboard);
+      setTokenBalance(bal);
+      setTokenUsdValue(usdPrice);
 
-    setStakingUsd(stakingUsdVal);
-    setBytaDailyUsd(bytaUsdVal);
-    setTotalRewardToken(totalToken);
+      const price = Number(usdPrice) || 0;
+      setTokenBalanceUsd(Number(bal) * price);
+      setStakedUsd(Number(dashboard.stakedAmount) * price);
 
-    const price = Number(usdPrice) || 0;
+      setLoading(false); // 👈 UI READY
 
-    setStakingByta(price ? stakingUsdVal / price : 0);
-    setBytaDailyByta(price ? bytaUsdVal / price : 0);
-    setTotalRewardUsd(Number(stakingUsdVal) + Number(bytaUsdVal));
+      /* ---------- SLOW DATA (BACKGROUND) ---------- */
+      const [
+        stakingUsdVal,
+        bytaUsdVal,
+        totalToken,
+        ref
+      ] = await Promise.all([
+        getPendingStakingRewardUSD(user),
+        getPendingBytaDailyUSD(user),
+        getPendingRewardsToken(user),
+        getReferralIncome(user)
+      ]);
 
-    setTokenBalanceUsd(Number(bal) * price);
-    setStakedUsd(Number(dashboard.stakedAmount) * price);
+      setStakingUsd(stakingUsdVal);
+      setBytaDailyUsd(bytaUsdVal);
+      setTotalRewardToken(totalToken);
+      setReferralIncome(ref);
 
-  } catch (err) {
-    console.error("Dashboard load error:", err);
-  } finally {
-    setLoading(false);
+      setStakingByta(price ? stakingUsdVal / price : 0);
+      setBytaDailyByta(price ? bytaUsdVal / price : 0);
+      setTotalRewardUsd(Number(stakingUsdVal) + Number(bytaUsdVal));
+
+    } catch (err) {
+      console.error("Dashboard load error:", err);
+      setLoading(false);
+    }
   }
-}
 
   async function handleClaim() {
     try {
@@ -134,10 +135,10 @@ export default function Dashboard() {
     7: "BYTA-7",
   };
 
-  /* ---------- ONLY NEW UI (minimal) ---------- */
+  /* ---------- CONNECT WALLET (ONLY ADDITION) ---------- */
   if (!walletConnected) {
     return (
-      <div className="main-container" style={{ textAlign: "center", marginTop: 100 }}>
+      <div className="main-container" style={{ textAlign: "center", marginTop: 120 }}>
         <button
           className="btn btn-primary"
           onClick={async () => {
@@ -160,9 +161,9 @@ export default function Dashboard() {
   const leftRef = `${baseUrl}/?ref=${address}&side=left`;
   const rightRef = `${baseUrl}/?ref=${address}&side=right`;
 
+  /* ---------- BELOW: 100% ORIGINAL UI ---------- */
   return (
     <div className="main-container">
-      {/* ⬇️ BELOW THIS: 100% SAME UI, NOTHING TOUCHED */}
       <h1>Dashboard</h1>
 
       <Box title="Wallet">
