@@ -1,45 +1,28 @@
 import { useEffect, useState } from "react";
-import { connectWallet } from "../lib/web3";
+
 
 // ✅ env first, fallback second
 const INDEXER_API =
   import.meta.env.VITE_INDEXER_API ||
   "https://byta-indexer-api.onrender.com";
 
-export default function Team() {
+export default function Team({ address }) {
   const [loading, setLoading] = useState(true);
   const [team, setTeam] = useState([]);
   const [leftCount, setLeftCount] = useState(0);
   const [rightCount, setRightCount] = useState(0);
   const [totalTeam, setTotalTeam] = useState(0);
-  const [account, setAccount] = useState(null);
+  
 
   /* ---------------- CONNECT WALLET ---------------- */
 
-  useEffect(() => {
-    let mounted = true;
-
-    async function init() {
-      try {
-        const addr = await connectWallet();
-        if (!mounted) return;
-        setAccount(addr.toLowerCase()); // ✅ normalize once
-      } catch (e) {
-        console.error("Wallet connect failed", e);
-        if (mounted) setLoading(false);
-      }
-    }
-
-    init();
-    return () => {
-      mounted = false;
-    };
-  }, []);
+ 
 
   /* ---------------- LOAD TEAM FROM INDEXER ---------------- */
 
   useEffect(() => {
-    if (!account) return;
+  if (!address) return;
+
 
     let mounted = true;
 
@@ -47,7 +30,8 @@ export default function Team() {
       try {
         setLoading(true);
 
-        const res = await fetch(`${INDEXER_API}/team/${account}`);
+        const res = await fetch(`${INDEXER_API}/team/${address}`);
+
 
         if (!res.ok) {
           throw new Error("Indexer API error");
@@ -77,9 +61,16 @@ export default function Team() {
     return () => {
       mounted = false;
     };
-  }, [account]);
+  }, [address]);
 
   /* ---------------- UI ---------------- */
+if (!address) {
+  return (
+    <div className="main-container">
+      <h2>Please connect your wallet</h2>
+    </div>
+  );
+}
 
   return (
     <div className="main-container">

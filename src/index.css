@@ -6,23 +6,23 @@
    THEME VARIABLES
 ========================= */
 :root{
-  --bg-1: #050b1d;
-  --bg-2: #0a1430;
+  --bg-1: #f80606;
+  --bg-2: #f5f7fc;
 
-  --card-bg: rgba(255,255,255,0.06);
-  --card-border: rgba(255,255,255,0.08);
+  --card-bg: rgba(245, 234, 234, 0.767);
+  --card-border: rgba(230, 218, 218, 0.08);
 
   --text-main: #ffffff;
-  --text-muted: #9aa4bf;
+  --text-muted: #ffffff;
 
-  --purple-1: #7c3aed;
-  --purple-2: #5b21b6;
+  --purple-1: #f50808f3;
+  --purple-2: #f50808f3;
 
-  --blue-1: #38bdf8;
-  --blue-2: #2563eb;
+  --blue-1: #ebf0f1;
+  --blue-2: #b1f908f5;
 
-  --green-1: #22c55e;
-  --green-2: #16a34a;
+  --green-1: #f50808f3;
+  --green-2: #f50808f3;
 }
 
 /* =========================
@@ -35,8 +35,8 @@ html,body,#root{
 body{
   margin:0;
   background:
-    radial-gradient(900px 500px at 15% -10%, rgba(124,58,237,0.25), transparent 40%),
-    radial-gradient(800px 400px at 85% 10%, rgba(56,189,248,0.18), transparent 45%),
+    radial-gradient(900px 500px at 15% -10%, rgba(86, 85, 87, 0.25), transparent 40%),
+    radial-gradient(800px 400px at 85% 10%, rgba(82, 83, 83, 0.18), transparent 45%),
     linear-gradient(180deg,var(--bg-1),var(--bg-2));
   color: var(--text-main);
   font-family: Inter, system-ui, -apple-system, Segoe UI, Roboto, Arial;
@@ -85,7 +85,7 @@ h2{
   transform: translateY(-4px);
   box-shadow:
     0 40px 80px rgba(2,6,23,0.95),
-    inset 0 1px 0 rgba(255,255,255,0.08);
+    inset 0 1px 0 rgba(67, 66, 66, 0.774);
 }
 
 /* Important cards */
@@ -166,12 +166,12 @@ button{
 .btn-primary{
   background: linear-gradient(90deg,var(--purple-1),var(--purple-2));
   color: #fff;
-  box-shadow: 0 14px 30px rgba(124,58,237,0.45);
+  box-shadow: 0 14px 30px rgba(66, 66, 67, 0.918);
 }
 
 .btn-secondary{
   background: linear-gradient(90deg,var(--blue-1),var(--blue-2));
-  color: #fff;
+  color: #f10b0b;
 }
 
 .btn-copy{

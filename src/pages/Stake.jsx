@@ -1,6 +1,5 @@
-import React, { useState } from "react";
+import React, { useState, useEffect } from "react";
 import {
-  connectWallet,
   tokenContract,
   stakingContract,
   getTokenBalance
@@ -43,24 +42,22 @@ async function ensureReferrer(user) {
 
 /* ---------------- COMPONENT ---------------- */
 
-export default function Stake() {
-  const [account, setAccount] = useState("");
+export default function Stake({ address }) {
   const [amount, setAmount] = useState("");
   const [status, setStatus] = useState("");
   const [balance, setBalance] = useState("0");
 
   /* ---------------- CONNECT ---------------- */
 
-  async function handleConnect() {
-    try {
-      const acc = await connectWallet();
-      setAccount(acc);
-      setBalance(await getTokenBalance(acc));
-      setStatus("Wallet connected");
-    } catch (e) {
-      setStatus("Connect failed: " + e.message);
-    }
+  useEffect(() => {
+  if (!address) {
+    setBalance("0");
+    return;
   }
+
+  getTokenBalance(address).then(setBalance);
+}, [address]);
+
 
   /* ---------------- STAKE ---------------- */
 
@@ -71,8 +68,9 @@ export default function Stake() {
         return;
       }
 
-      const user = await connectWallet();
+      const user = address;
       await ensureReferrer(user);
+
 
       const tc = tokenContract();
       const sc = stakingContract();
@@ -85,7 +83,7 @@ export default function Stake() {
       await (await sc.stake(wei)).wait();
 
       setStatus("Stake successful");
-      setBalance(await getTokenBalance(user));
+      setBalance(await getTokenBalance(address));
     } catch (e) {
       setStatus("Stake failed: " + e.message);
     }
@@ -125,23 +123,24 @@ export default function Stake() {
     }
   }
 
+if (!address) {
+  return (
+    <div className="main-container">
+      <h2>Please connect your wallet</h2>
+    </div>
+  );
+}
+
   return (
     <div className="main-container">
       <h1>Stake / Unstake BYTA</h1>
 
-      {!account && (
-        <div className="card section">
-          <button className="btn btn-primary" onClick={handleConnect}>
-            Connect Wallet
-          </button>
-        </div>
-      )}
-
-      {account && (
+      
+      {address && (
         <>
           <div className="card section">
             <div className="label">Wallet</div>
-            <div className="sub-value accent-blue">{account}</div>
+            <div className="sub-value accent-blue">{address}</div>
           </div>
 
           <div className="card section">
@@ -159,15 +158,15 @@ export default function Stake() {
             />
 
             <div style={{ display: "flex", gap: 12, marginTop: 16 }}>
-              <button className="btn btn-primary" onClick={handleStake}>
+              <button type="button" className="btn btn-primary" onClick={handleStake}>
                 Stake
               </button>
 
-              <button className="btn btn-secondary" onClick={handleUnstake}>
+              <button type="button" className="btn btn-secondary" onClick={handleUnstake}>
                 Unstake
               </button>
 
-              <button className="btn btn-copy" onClick={handleClaim}>
+              <button type="button" className="btn btn-copy" onClick={handleClaim}>
                 Claim
               </button>
             </div>

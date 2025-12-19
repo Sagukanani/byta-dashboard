@@ -32,8 +32,7 @@ function copyText(text) {
   navigator.clipboard.writeText(text);
 }
 
-export default function Dashboard() {
-  const [address, setAddress] = useState("");
+export default function Dashboard({ address }) {
   const [loading, setLoading] = useState(true);
   const [claimStatus, setClaimStatus] = useState("");
 
@@ -46,7 +45,6 @@ export default function Dashboard() {
 
   const [tokenBalance, setTokenBalance] = useState("0");
   const [tokenUsdValue, setTokenUsdValue] = useState("0");
-
   const [tokenBalanceUsd, setTokenBalanceUsd] = useState("0");
   const [stakedUsd, setStakedUsd] = useState("0");
 
@@ -61,17 +59,13 @@ export default function Dashboard() {
 
   const [referralIncome, setReferralIncome] = useState("0");
 
-  // useEffect(() => {
-//   load();
-// }, []);
-
-
+  // 🔴 MAIN LOAD FUNCTION (UNCHANGED)
   async function load() {
     try {
       setLoading(true);
 
-      const user = await connectWallet();
-      setAddress(user.toLowerCase());
+      const user = address;
+
 
       const dashboard = await getUserDashboardData(user);
       setData(dashboard);
@@ -109,18 +103,43 @@ export default function Dashboard() {
     }
   }
 
-  async function handleClaim() {
-    try {
-      setClaimStatus("Claiming reward...");
-      const sc = stakingContract();
-      const tx = await sc.claim();
-      await tx.wait();
-      setClaimStatus("Reward claimed successfully");
-      await load();
-    } catch (err) {
-      setClaimStatus("Claim failed: " + err.message);
+    // ✅ AUTO LOAD DASHBOARD WHEN ADDRESS IS AVAILABLE
+  useEffect(() => {
+    if (address) {
+      load();
     }
+  }, [address]);
+
+  // 🔥 LISTEN FOR CONNECT BUTTON FROM App.jsx
+ 
+
+  async function handleClaim() {
+  try {
+    setClaimStatus("Claiming reward...");
+    const sc = stakingContract();
+    const tx = await sc.claim();
+    await tx.wait();
+
+    setClaimStatus("Reward claimed");
+
+    // 🔹 only update affected values
+    const user = address;
+
+    setTokenBalance(await getTokenBalance(user));
+
+    const stakingUsdVal = await getPendingStakingRewardUSD(user);
+    const bytaUsdVal = await getPendingBytaDailyUSD(user);
+    const totalToken = await getPendingRewardsToken(user);
+
+    setStakingUsd(stakingUsdVal);
+    setBytaDailyUsd(bytaUsdVal);
+    setTotalRewardToken(totalToken);
+
+  } catch (err) {
+    setClaimStatus("Claim failed: " + err.message);
   }
+}
+
 
   const TIER_NAMES = {
     0: "No Tier",
@@ -134,38 +153,26 @@ export default function Dashboard() {
   };
 
   if (loading && address) {
-  return <div className="main-container">Loading dashboard…</div>;
-}
-
+    return <div className="main-container">Loading dashboard…</div>;
+  }
 
   const baseUrl = window.location.origin;
   const leftRef = `${baseUrl}/?ref=${address}&side=left`;
   const rightRef = `${baseUrl}/?ref=${address}&side=right`;
 
+if (!address) {
   return (
     <div className="main-container">
-      {!address && (
-  <button
-    className="btn btn-primary"
-    onClick={load}
-    style={{ marginBottom: 20 }}
-  >
-    Connect Wallet
-  </button>
-)}
+      <h2>Please connect your wallet</h2>
+    </div>
+  );
+}
 
+  return (
+    <div className="main-container">
       <h1>Dashboard</h1>
 
-      <Box title="Wallet">
-        <span
-          className="accent-blue"
-          style={{ cursor: "pointer", wordBreak: "break-all" }}
-          onClick={() => copyText(address)}
-          title="Click to copy full address"
-        >
-          {shortText(address)}
-        </span>
-      </Box>
+      
 
       {/* TOP GRID */}
       <div className="stat-grid section">
@@ -192,9 +199,14 @@ export default function Dashboard() {
         </Box>
 
         <Box title="Claim Rewards">
-          <button className="btn btn-primary" onClick={handleClaim}>
+          <button
+            type="button"
+            className="btn btn-primary"
+            onClick={handleClaim}
+         >
             Claim Reward
-          </button>
+         </button>
+
           {claimStatus && <div className="sub-value">{claimStatus}</div>}
         </Box>
       </div>
@@ -239,7 +251,6 @@ export default function Dashboard() {
               className="sub-value"
               style={{ cursor: "pointer", wordBreak: "break-all" }}
               onClick={() => copyText(leftRef)}
-              title="Click to copy full link"
             >
               {shortText(leftRef)}
             </div>
@@ -253,7 +264,6 @@ export default function Dashboard() {
               className="sub-value"
               style={{ cursor: "pointer", wordBreak: "break-all" }}
               onClick={() => copyText(rightRef)}
-              title="Click to copy full link"
             >
               {shortText(rightRef)}
             </div>
