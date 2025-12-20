@@ -177,21 +177,7 @@ export async function getReferralIncome(user) {
 
 /* ---------------- TEAM (INDEXER BASED – FINAL) ---------------- */
 
-const INDEXER_API =
-  import.meta.env.VITE_INDEXER_API ||
-  "https://byta-indexer-api.onrender.com";
 
-export async function getTeamFromIndexer(user) {
-  const res = await fetch(
-    `${INDEXER_API}/team/${user.toLowerCase()}`
-  );
-
-  if (!res.ok) {
-    throw new Error("Indexer API failed");
-  }
-
-  return res.json();
-}
 
 
 /* ---------------- PENDING REWARDS (USD) ---------------- */
@@ -219,4 +205,20 @@ export async function getPendingRewardsToken(user) {
 
   const tokenWei = await tc.toToken(parseEther(totalUsd.toString()));
   return formatEther(tokenWei);
+}
+/* ---------------- DIRECT TEAM (ON-CHAIN) ---------------- */
+
+// ✅ DIRECT referrals only (level 1)
+export async function getDirectTeam(user) {
+  const sc = stakingContract();
+
+  // call contract view
+  const addresses = await sc.getDirectReferrals(user);
+
+  // frontend-friendly format
+  return addresses.map(addr => ({
+    address: addr,
+    level: 1,
+    side: "direct"
+  }));
 }
