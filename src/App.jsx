@@ -95,9 +95,9 @@ async function handleConnect() {
               position: "fixed",
               top: 0,
               right: 0,
-              width: 360,
+              width: 200,
               height: "100%",
-              background: "#222",
+              background: "#4c4b4bff",
               zIndex: 50,
               padding: 20,
               fontFamily: "system-ui, -apple-system, BlinkMacSystemFont"
@@ -126,33 +126,6 @@ async function handleConnect() {
 
             <hr />
 
-            {/* REFERRAL LINK + COPY */}
-            <div style={{ marginTop: 14 }}>
-              <div style={{ fontSize: 13, marginBottom: 6 }}>Referral Link</div>
-              <div style={{ display: "flex", gap: 8 }}>
-                <input
-                  readOnly
-                  value={window.location.origin + "/?ref=" + wallet.address}
-                  style={{
-                    flex: 1,
-                    fontSize: 12,
-                    padding: 6,
-                    background: "#111",
-                    color: "#fff",
-                    border: "1px solid #333",
-                    borderRadius: 4
-                  }}
-                />
-                <button
-                  onClick={() =>
-                    copyText(window.location.origin + "/?ref=" + wallet.address)
-                  }
-                  style={{ cursor: "pointer" }}
-                >
-                  Copy
-                </button>
-              </div>
-            </div>
 
             {/* DISCONNECT */}
             <button
@@ -187,7 +160,7 @@ async function handleConnect() {
       left: 0,
       height: "100%",
       width: 260,
-      background: "#efe6e6ff",
+      background: "#f8f5f5ff",
       zIndex: 30
     }}
   >

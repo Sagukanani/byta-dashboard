@@ -20,17 +20,17 @@ export default function Sidebar({ onClose, onNavigate, currentPage }) {
         cursor: "pointer",
         marginBottom: 8,
         transition: "all .25s ease",
-        boxShadow: "0 10px 25px rgba(113, 109, 109, 0.6)",
+        boxShadow: "0 10px 25px rgba(69, 66, 66, 0.91)",
       }}
       onMouseEnter={(e) => {
         e.currentTarget.style.transform = "translateY(-2px)";
         e.currentTarget.style.boxShadow =
-          "0 16px 40px rgba(136, 132, 132, 0.45)";
+          "0 16px 40px rgba(77, 76, 76, 0.93)";
       }}
       onMouseLeave={(e) => {
         e.currentTarget.style.transform = "translateY(0)";
         e.currentTarget.style.boxShadow =
-          "0 10px 25px rgba(23, 9, 2, 0.6)";
+          "0 10px 25px rgba(77, 76, 76, 0.93)";
       }}
     >
       {children}
@@ -69,8 +69,8 @@ export default function Sidebar({ onClose, onNavigate, currentPage }) {
         <button
           onClick={onClose}
           style={{
-            background: "rgba(12, 6, 1, 0.75)",
-            color: "#fdfbfbff",
+            background: "rgba(6, 6, 5, 0.95)",
+            color: "#fb0707ff",
             border: "1px solid rgba(6, 1, 0, 0.91)",
             borderRadius: 10,
             padding: "6px 10px",
