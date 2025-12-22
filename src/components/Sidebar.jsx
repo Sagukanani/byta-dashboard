@@ -82,16 +82,7 @@ export default function Sidebar({ onClose, onNavigate, currentPage }) {
         </button>
       </div>
 
-      <Btn
-  onClick={() => {
-    if (currentPage !== "home") {
-      onNavigate("home");
-    }
-  }}
->
-  🏠 Home
-</Btn>
-
+     
 
       {/* NAVIGATION */}
      
