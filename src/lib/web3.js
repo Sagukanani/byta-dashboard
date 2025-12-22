@@ -175,10 +175,6 @@ export async function getReferralIncome(user) {
   return formatEther(total);
 }
 
-/* ---------------- TEAM (INDEXER BASED – FINAL) ---------------- */
-
-
-
 
 /* ---------------- PENDING REWARDS (USD) ---------------- */
 
@@ -221,4 +217,60 @@ export async function getDirectTeam(user) {
     level: 1,
     side: "direct"
   }));
+}
+
+/* =========================================================
+   LOCKED SUMMARY (FOR DASHBOARD)
+   ========================================================= */
+
+export async function getLockedSummary(address) {
+  const sc = stakingContract();
+
+  const [totalLocked, activeLocks, locks] = await Promise.all([
+    sc.getUserTotalLocked(address),
+    sc.getUserActiveLocks(address),
+    sc.getUserLocks(address)
+  ]);
+
+  let pendingRewardWei = 0n;
+  const now = BigInt(Math.floor(Date.now() / 1000));
+
+  for (const l of locks) {
+    if (l.amount === 0n) continue;
+    if (l.lastClaim === 0n || now <= l.lastClaim) continue;
+
+    const rewardPeriod = 86400n; // 1 day
+    const rewardBP = 100n;       // base 1%
+
+    const elapsed = now - l.lastClaim;
+    const periods = elapsed / rewardPeriod;
+    if (periods <= 0n) continue;
+
+    const bonusBPMap = {
+      1: 10200n,
+      3: 10400n,
+      6: 10600n,
+      12: 10800n,
+      24: 11000n
+    };
+
+    const bonusBP =
+      bonusBPMap[Number(l.lockMonths)] || 10000n;
+
+    const reward =
+      (l.amount *
+        rewardBP *
+        periods *
+        bonusBP) /
+      10000n /
+      10000n;
+
+    pendingRewardWei += reward;
+  }
+
+  return {
+    totalLocked: formatUnits(totalLocked, 18),
+    activeLocks: Number(activeLocks),
+    pendingReward: formatUnits(pendingRewardWei, 18)
+  };
 }

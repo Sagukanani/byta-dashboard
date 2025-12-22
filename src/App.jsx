@@ -1,6 +1,8 @@
 ﻿import React, { useEffect, useState } from "react";
 import Sidebar from "./components/Sidebar";
 import { connectWallet } from "./lib/web3";
+import LongTermStakeV2 from "./pages/LongTermStakeV2.jsx";
+import Home from "./pages/Home.jsx";
 
 import Dashboard from "./pages/dashboard.jsx";
 import Stake from "./pages/Stake.jsx";
@@ -14,7 +16,7 @@ function copyText(text) {
 
 export default function App() {
   const [sidebarOpen, setSidebarOpen] = useState(false);
-  const [page, setPage] = useState("dashboard");
+  const [page, setPage] = useState("home");
 
   const [wallet, setWallet] = useState({
     connected: false,
@@ -37,7 +39,7 @@ async function handleConnect() {
 
   
   return (
-    <div style={{ minHeight: "100vh", background: "#323131ff", color: "#fff" }}>
+    <div style={{ minHeight: "100vh", background: "#323131ff", color: "#fbf9f9ff" }}>
       {/* SIDEBAR BUTTON – UNCHANGED */}
       {!sidebarOpen && (
         <button
@@ -129,7 +131,7 @@ async function handleConnect() {
 
             {/* DISCONNECT */}
             <button
-              style={{ marginTop: 24, color: "red", cursor: "pointer" }}
+              style={{ marginTop: 24, color: "black", cursor: "pointer" }}
               onClick={() => {
                 setWallet({ connected: false, address: "" });
                 setWalletMenuOpen(false);
@@ -160,7 +162,7 @@ async function handleConnect() {
       left: 0,
       height: "100%",
       width: 260,
-      background: "#f8f5f5ff",
+      background: "#fdfcfcff",
       zIndex: 30
     }}
   >
@@ -189,6 +191,11 @@ async function handleConnect() {
       {/* MAIN CONTENT – UNCHANGED */}
      <div style={{ padding: "80px 20px" }}>
 
+      <div style={{ display: page === "home" ? "block" : "none" }}>
+       <Home onStart={() => setPage("dashboard")} />
+    </div>
+
+
   <div style={{ display: page === "dashboard" ? "block" : "none" }}>
     <Dashboard address={wallet.address} />
   </div>
@@ -196,6 +203,10 @@ async function handleConnect() {
   <div style={{ display: page === "stake" ? "block" : "none" }}>
     <Stake address={wallet.address} />
   </div>
+  
+ <div style={{ display: page === "longterm" ? "block" : "none" }}>
+  <LongTermStakeV2 address={wallet.address} />
+ </div>
 
   <div style={{ display: page === "team" ? "block" : "none" }}>
     <Team address={wallet.address} />

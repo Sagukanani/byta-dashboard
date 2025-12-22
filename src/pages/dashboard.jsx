@@ -8,10 +8,21 @@ import {
   getReferralIncome,
   getPendingStakingRewardUSD,
   getPendingBytaDailyUSD,
-  getPendingRewardsToken
+  getPendingRewardsToken,
+  getLockedSummary,
 } from "../lib/web3";
 
 /* ---------- HELPERS (UI ONLY) ---------- */
+function formatTimeLeft(seconds) {
+  if (seconds <= 0) return "Expired";
+
+  const d = Math.floor(seconds / 86400);
+  const h = Math.floor((seconds % 86400) / 3600);
+  const m = Math.floor((seconds % 3600) / 60);
+
+  return `${d}d ${h}h ${m}m`;
+}
+
 function formatNumber(n, d = 2) {
   const num = Number(n);
   if (!num || isNaN(num)) return "0";
@@ -47,6 +58,10 @@ export default function Dashboard({ address }) {
   const [tokenUsdValue, setTokenUsdValue] = useState("0");
   const [tokenBalanceUsd, setTokenBalanceUsd] = useState("0");
   const [stakedUsd, setStakedUsd] = useState("0");
+  
+  
+const [locks, setLocks] = useState([]);
+
 
   const [stakingUsd, setStakingUsd] = useState("0");
   const [stakingByta, setStakingByta] = useState("0");
@@ -58,6 +73,17 @@ export default function Dashboard({ address }) {
   const [totalRewardUsd, setTotalRewardUsd] = useState("0");
 
   const [referralIncome, setReferralIncome] = useState("0");
+
+  const [selectedLockIndex, setSelectedLockIndex] = useState(0);
+  const [selectedLock, setSelectedLock] = useState(null);
+
+    const [lockedSummary, setLockedSummary] = useState({
+    totalLocked: "0",
+    activeLocks: 0,
+    pendingReward: "0",
+  });
+
+ 
 
   // 🔴 MAIN LOAD FUNCTION (UNCHANGED)
   async function load() {
@@ -79,6 +105,25 @@ export default function Dashboard({ address }) {
       const ref = await getReferralIncome(user);
       setReferralIncome(ref);
 
+      const lockSummary = await getLockedSummary(user);
+      setLockedSummary(lockSummary);
+
+      // 👇 fetch actual lock details
+const sc = stakingContract();
+const userLocks = await sc.getUserLocks(user);
+setLocks(userLocks.filter(l => l.amount > 0n));
+
+// set default selected lock
+if (userLocks.length > 0) {
+  setSelectedLock(userLocks[selectedLockIndex] || userLocks[0]);
+}
+
+
+// 👇 NEW: selected lock data
+if (lockSummary.locks && lockSummary.locks.length > 0) {
+  setSelectedLock(lockSummary.locks[selectedLockIndex] || lockSummary.locks[0]);
+}
+
       const stakingUsdVal = await getPendingStakingRewardUSD(user);
       const bytaUsdVal = await getPendingBytaDailyUSD(user);
       const totalToken = await getPendingRewardsToken(user);
@@ -96,6 +141,10 @@ export default function Dashboard({ address }) {
       setTokenBalanceUsd(Number(bal) * price);
       setStakedUsd(Number(dashboard.stakedAmount) * price);
 
+      // 🔒 LOCKED SUMMARY (NEW)
+      const lockData = await getLockedSummary(user);
+      setLockedSummary(lockData);
+
     } catch (err) {
       console.error("Dashboard load error:", err);
     } finally {
@@ -109,6 +158,12 @@ export default function Dashboard({ address }) {
       load();
     }
   }, [address]);
+ 
+  useEffect(() => {
+  if (locks.length > 0) {
+    setSelectedLock(locks[selectedLockIndex]);
+  }
+}, [selectedLockIndex, locks]);
 
   // 🔥 LISTEN FOR CONNECT BUTTON FROM App.jsx
  
@@ -137,6 +192,26 @@ export default function Dashboard({ address }) {
 
   } catch (err) {
     setClaimStatus("Claim failed: " + err.message);
+  }
+}
+// 🔒 CLAIM SELECTED LOCK REWARD
+async function handleClaimLockReward() {
+  if (!selectedLock) return;
+
+  try {
+    setClaimStatus("Claiming lock reward...");
+
+    const sc = stakingContract();
+    const tx = await sc.claimLockedV2(selectedLockIndex);
+    await tx.wait();
+
+    setClaimStatus("Lock reward claimed 🎉");
+
+    // 🔄 refresh dashboard
+    await load();
+
+  } catch (err) {
+    setClaimStatus("Lock claim failed: " + err.message);
   }
 }
 
@@ -186,13 +261,23 @@ if (!address) {
         </Box>
 
         <Box title="Staked Amount">
-          <div className="value accent-green">
-            {formatNumber(data.stakedAmount)} BYTA
-          </div>
-          <div className="sub-value">
-            ≈ ${formatNumber(stakedUsd)} USD
-          </div>
-        </Box>
+
+  {/* STAKED AMOUNT (ALWAYS SAME) */}
+  <div className="value accent-green">
+    {formatNumber(data.stakedAmount)} BYTA
+  </div>
+
+  <div className="sub-value">
+    ≈ ${formatNumber(stakedUsd)} USD
+  </div>
+
+ 
+
+</Box>
+
+
+
+
 
         <Box title="Your Tier">
           <div className="value">{TIER_NAMES[data.tier]}</div>
@@ -240,6 +325,136 @@ if (!address) {
           <div className="value">{formatNumber(referralIncome)} BYTA</div>
         </Box>
       </div>
+
+     {/* 🔒 LOCKED SUMMARY */}
+<div className="stat-grid section">
+ <Box title="🔒 Locked Summary">
+  {/* 🔲 TWO COLUMN LAYOUT */}
+  <div
+    style={{
+      display: "grid",
+      gridTemplateColumns: "1fr auto",
+      gap: 20,
+      alignItems: "flex-start"
+    }}
+  >
+    {/* ⬅️ LEFT SIDE */}
+    <div>
+      <div className="value accent-green">
+        {formatNumber(lockedSummary.totalLocked)} BYTA
+      </div>
+
+      {/* ACTIVE LOCKS */}
+      <div style={{ marginTop: 6 }}>
+        <b>Active Locks:</b>
+        <div style={{ display: "flex", gap: 8, marginTop: 6 }}>
+          {Array.from({ length: lockedSummary.activeLocks }).map((_, i) => (
+            <button
+              key={i}
+              onClick={() => setSelectedLockIndex(i)}
+              className="btn btn-secondary"
+              style={{
+                padding: "6px 12px",
+                borderRadius: 8,
+                background:
+                  selectedLockIndex === i ? "#e62806f0" : "#070404ff",
+                color: "#fff",
+                border: "1px solid #333",
+                fontSize: 13
+              }}
+            >
+              Lock {i + 1}
+            </button>
+          ))}
+        </div>
+      </div>
+    </div>
+
+   {/* ➡️ RIGHT SIDE (ACTION AREA) */}
+<div
+  style={{
+    display: "flex",
+    flexDirection: "column",
+    alignItems: "flex-end",
+    gap: 10,
+    minWidth: 240
+  }}
+>
+  <button
+    className="btn btn-primary"
+    style={{
+      padding: "12px 20px",
+      borderRadius: 12,
+      fontWeight: 600
+    }}
+    disabled={
+      !selectedLock ||
+      Number(lockedSummary.pendingReward) === 0
+    }
+    onClick={handleClaimLockReward}
+  >
+    🔓 Claim Lock Reward
+  </button>
+
+  {/* ✅ PENDING LOCK REWARD — JUST BELOW BUTTON */}
+  <div
+    style={{
+      fontSize: 13,
+      color: "#aaaaaaff",
+      textAlign: "right"
+    }}
+  >
+    Pending Lock Reward:{" "}
+    <span style={{ color: "#ff3b3b", fontWeight: 600 }}>
+      {formatNumber(lockedSummary.pendingReward, 6)} BYTA
+    </span>
+  </div>
+</div>
+  </div>
+  {/* 🔍 SELECTED LOCK DETAILS (FULL WIDTH BELOW) */}
+  {selectedLock && (
+  <div
+    style={{
+      marginTop: 12,
+      padding: 12,
+      borderRadius: 10,
+      background: "#070404ff",
+      border: "1px solid #333",
+      fontSize: 13
+    }}
+  >
+    <div><b>Selected Lock:</b> #{selectedLockIndex + 1}</div>
+
+    <div>
+      <b>Amount:</b>{" "}
+      {(Number(selectedLock.amount) / 1e18).toFixed(6)} BYTA
+    </div>
+
+    <div>
+      <b>Lock Period:</b> {selectedLock.lockMonths} months
+    </div>
+
+    <div>
+      <b>Auto Renew:</b>{" "}
+      {selectedLock.autoRenewCount > 0 ? "Yes" : "No"}
+    </div>
+
+    {/* ⏳ COUNTDOWN TIMER */}
+    <div style={{ marginTop: 6 }}>
+      <b>Time Left:</b>{" "}
+      <span style={{ color: "#f5a623" }}>
+        {formatTimeLeft(
+  Number(selectedLock.end) - Math.floor(Date.now() / 1000)
+)}
+      </span>
+    </div>
+  </div>
+)}
+
+</Box>
+
+</div>
+
 
       {/* REFERRAL LINKS */}
       <div className="section">

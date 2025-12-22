@@ -10,8 +10,8 @@ export default function Sidebar({ onClose, onNavigate, currentPage }) {
         width: "100%",
         textAlign: "left",
         background:
-          "linear-gradient(135deg, rgba(243, 237, 234, 0.94), rgba(8, 4, 0, 0.82))",
-        color: "#750e0eef",
+          "linear-gradient(135deg, rgba(243, 237, 234, 0.94), rgba(243, 237, 234, 0.94))",
+        color: "#b00404ef",
         padding: "12px 16px",
         borderRadius: 14,
         border: "1px solid rgba(247, 6, 6, 0.08)",
@@ -20,7 +20,7 @@ export default function Sidebar({ onClose, onNavigate, currentPage }) {
         cursor: "pointer",
         marginBottom: 8,
         transition: "all .25s ease",
-        boxShadow: "0 10px 25px rgba(69, 66, 66, 0.91)",
+        boxShadow: "0 10px 25px rgba(81, 81, 81, 0.91)",
       }}
       onMouseEnter={(e) => {
         e.currentTarget.style.transform = "translateY(-2px)";
@@ -43,8 +43,8 @@ export default function Sidebar({ onClose, onNavigate, currentPage }) {
         height: "100%",
         padding: 22,
         background:
-          "linear-gradient(180deg, #444343ff 0%, #4e4d4dff 100%)",
-        color: "#ffff",
+          "linear-gradient(180deg, #555252ff 0%, #555252ff 100%)",
+        color: "#fbf9f9ff",
         display: "flex",
         flexDirection: "column",
         gap: 14,
@@ -69,21 +69,42 @@ export default function Sidebar({ onClose, onNavigate, currentPage }) {
         <button
           onClick={onClose}
           style={{
-            background: "rgba(6, 6, 5, 0.95)",
-            color: "#fb0707ff",
+            background: "rgba(252, 252, 250, 0.95)",
+            color: "#b00404ef",
             border: "1px solid rgba(6, 1, 0, 0.91)",
             borderRadius: 10,
-            padding: "6px 10px",
+            padding: "0px 8px",
             cursor: "pointer",
-            fontSize: 22,
+            fontSize: 35,
           }}
         >
           ×
         </button>
       </div>
 
+      <Btn
+  onClick={() => {
+    if (currentPage !== "home") {
+      onNavigate("home");
+    }
+  }}
+>
+  🏠 Home
+</Btn>
+
+
       {/* NAVIGATION */}
-     {/* NAVIGATION */}
+     
+     <Btn
+  onClick={() => {
+    if (currentPage !== "home") {
+      onNavigate("home");
+    }
+  }}
+>
+  🏠 Home
+</Btn>
+
 <Btn
   onClick={() => {
     if (currentPage !== "dashboard") {
@@ -114,6 +135,17 @@ export default function Sidebar({ onClose, onNavigate, currentPage }) {
   🟡 Stake
 </Btn>
 
+<Btn
+  onClick={() => {
+    if (currentPage !== "longterm") {
+      onNavigate("longterm");
+    }
+  }}
+>
+  🔒 Long Term Stake
+</Btn>
+
+
 {/* BUY / SELL */}
 <div>
   <Btn onClick={() => setBuyOpen(!buyOpen)}>🔁 Buy / Sell</Btn>
@@ -122,7 +154,7 @@ export default function Sidebar({ onClose, onNavigate, currentPage }) {
     <div
       style={{
         marginLeft: 10,
-        marginTop: 6,
+        marginTop: 14,
         paddingLeft: 10,
         borderLeft: "2px solid rgba(245, 244, 247, 0.94)",
       }}
@@ -133,9 +165,9 @@ export default function Sidebar({ onClose, onNavigate, currentPage }) {
         rel="noreferrer"
         style={{
           display: "block",
-          fontSize: 14,
-          color: "#d1d5db",
-          marginBottom: 6,
+          fontSize: 17,
+          color: "#faf6f6ff",
+          marginBottom: 16,
           textDecoration: "none",
         }}
       >
@@ -148,8 +180,8 @@ export default function Sidebar({ onClose, onNavigate, currentPage }) {
         rel="noreferrer"
         style={{
           display: "block",
-          fontSize: 14,
-          color: "#d1d5db",
+          fontSize: 17,
+          color: "#faf6f6ff",
           textDecoration: "none",
         }}
       >
@@ -163,7 +195,7 @@ export default function Sidebar({ onClose, onNavigate, currentPage }) {
 
       <div style={{ flex: 1 }} />
 
-      <div style={{ fontSize: 12, opacity: 0.6 }}>
+      <div style={{ fontSize: 12, opacity: 0.9 }}>
         © {new Date().getFullYear()} BYTA
       </div>
     </div>
