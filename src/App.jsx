@@ -72,7 +72,7 @@ async function handleConnect() {
     style={{
       position: "fixed",
       top: 20,
-      right: 140,
+      right: 170,
       zIndex: 40
     }}
   >
