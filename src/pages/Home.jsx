@@ -2,6 +2,8 @@ import React, { useEffect, useRef, useState } from "react";
 import Footer from "../components/Footer";
 import NET from "vanta/dist/vanta.net.min";
 import * as THREE from "three";
+import StakingCalculator from "../components/StakingCalculator";
+
 
 export default function Home({ onConnect }) {
   const vantaRef = useRef(null);
@@ -43,27 +45,18 @@ export default function Home({ onConnect }) {
   return (
     <div style={{ width: "100%", overflowX: "hidden" }}>
       {/* ================= HERO SECTION ================= */}
-     <section
+    <section
   style={{
     position: "relative",
-    width: "100vw",
-    left: "50%",
-    right: "50%",
-    marginLeft: "-50vw",
-    marginRight: "-50vw",
-
     minHeight: "65vh",
     display: "flex",
-    flexDirection: "column",
-    justifyContent: "flex-start",
-    alignItems: "center",
+    justifyContent: "center",
     textAlign: "center",
-
-    paddingTop: "50px",
-    paddingBottom: "20px",
+    padding: "60px 16px",
     overflow: "hidden",
   }}
 >
+
 {/* 🔮 VANTA BACKGROUND */}
 <div
   ref={vantaRef}
@@ -84,12 +77,22 @@ export default function Home({ onConnect }) {
           }}
         />
 
-        <div style={{ position: "relative", zIndex: 2 }}>
+       <div
+  style={{
+    position: "relative",
+    zIndex: 2,
+    maxWidth: 1100,
+    width: "100%",
+    margin: "0 auto",
+  }}
+>
+
           <h1
             style={{
               fontSize: "clamp(40px, 6vw, 72px)",
               fontWeight: 900,
-              marginBottom: 24,
+              marginBottom: 50,
+              marginTop: 230,
               lineHeight: 1.1,
             }}
           >
@@ -109,27 +112,7 @@ export default function Home({ onConnect }) {
             long-term value creation, and decentralized income distribution.
           </p>
 
-          <button
-            onClick={onConnect}
-            className="btn btn-primary"
-            style={{
-              padding: "16px 38px",
-              fontSize: 16,
-              borderRadius: 999,
-            }}
-          >
-            Connect Wallet
-          </button>
-
-          <div
-            style={{
-              marginTop: 12,
-              fontSize: 13,
-              opacity: 0.8,
-            }}
-          >
-            Non-custodial • On-chain • Transparent rewards
-          </div>
+         
         </div>
       </section>
 
@@ -200,25 +183,44 @@ export default function Home({ onConnect }) {
         </div>
       </section>
 
-      {/* ================= SECURITY ================= */}
-      <section className="section">
-        <h2 className="section-title">Security & Transparency</h2>
+{/* ================= STAKING CALCULATOR ================= */}
+<section className="section">
+  <h2 className="section-title">Staking Calculator</h2>
 
-        <ul
-          style={{
-            listStyle: "none",
-            padding: 0,
-            lineHeight: 2,
-            fontSize: 15,
-            opacity: 0.85,
-          }}
-        >
-          <li>• Non-custodial architecture</li>
-          <li>• Smart-contract based execution</li>
-          <li>• Verifiable on-chain transactions</li>
-          <li>• No centralized control over funds</li>
-        </ul>
-      </section>
+  <p
+    style={{
+      maxWidth: 700,
+      fontSize: 15,
+      lineHeight: 1.8,
+      opacity: 0.85,
+      marginBottom: 30,
+      marginInline: "auto",
+      textAlign: "center",
+    }}
+  >
+    Estimate your staking rewards for normal and long-term staking before you
+    commit your BYTA tokens.
+  </p>
+
+  <div style={{ maxWidth: 520, margin: "0 auto" }}>
+    <StakingCalculator />
+  </div>
+</section>
+
+
+      {/* ================= SECURITY ================= */}
+     <section className="section">
+  <h2 className="section-title">Security & Transparency</h2>
+
+  <ul className="security-list security-fixed">
+  <li>Non-custodial architecture</li>
+  <li>Smart-contract based execution</li>
+  <li>Verifiable on-chain transactions</li>
+  <li>No centralized control over funds</li>
+</ul>
+</section>
+
+
 
       {/* ================= FINAL CTA ================= */}
       <section

@@ -3,6 +3,9 @@ import Sidebar from "./components/Sidebar";
 import { connectWallet } from "./lib/web3";
 import LongTermStakeV2 from "./pages/LongTermStakeV2.jsx";
 import Home from "./pages/Home.jsx";
+import FlagButton from "./components/FlagButton";
+
+
 
 import Dashboard from "./pages/dashboard.jsx";
 import Stake from "./pages/Stake.jsx";
@@ -61,33 +64,53 @@ async function handleConnect() {
         </button>
       )}
 
-      {/* 🔥 TOP RIGHT WALLET BUTTON */}
-      <button
-        onClick={() => {
-          if (!wallet.connected) {
-            handleConnect();
-          } else {
-            setWalletMenuOpen(true);
-          }
-        }}
-        style={{
-          position: "fixed",
-          top: 20,
-          right: 24,
-          padding: "12px 22px",
-          borderRadius: 999,
-          background: "#e62806f0",
-          color: "#ffff",
-          fontWeight: 600,
-          border: "none",
-          cursor: "pointer",
-          zIndex: 40
-        }}
-      >
-        {wallet.connected
-          ? wallet.address.slice(0, 6) + "..." + wallet.address.slice(-4)
-          : "Connect Wallet"}
-      </button>
+     
+
+{/* 🌍 FLAG BUTTON */}
+<div
+  style={{
+    position: "fixed",
+    top: 20,
+    right: 120,
+    left: 380,
+    zIndex: 9999,          // 🔥 VERY IMPORTANT
+    pointerEvents: "auto" // 🔥 CLICK ENABLE
+  }}
+>
+  <FlagButton />
+</div>
+
+
+ {/* 💼 WALLET BUTTON */}
+<button
+  onClick={() => {
+    if (!wallet.connected) {
+      handleConnect();
+    } else {
+      setWalletMenuOpen(true);
+    }
+  }}
+  style={{
+    position: "fixed",   // ✅ ADD
+    top: 20,             // ✅ ADD
+    right: 24,           // ✅ ADD
+    padding: "12px 22px",
+    borderRadius: 999,
+    background: "#e62806f0",
+    color: "#ffff",
+    fontWeight: 600,
+    border: "none",
+    cursor: "pointer",
+    zIndex: 40            // ✅ ADD
+  }}
+>
+
+    {wallet.connected
+      ? wallet.address.slice(0, 6) + "..." + wallet.address.slice(-4)
+      : "Connect Wallet"}
+  </button>
+
+
 
       {/* WALLET MENU */}
       {walletMenuOpen && (
@@ -197,7 +220,11 @@ async function handleConnect() {
 
 
   <div style={{ display: page === "dashboard" ? "block" : "none" }}>
-    <Dashboard address={wallet.address} />
+   <Dashboard
+  address={wallet.address}
+  onNavigate={handleNavigate}
+/>
+
   </div>
 
   <div style={{ display: page === "stake" ? "block" : "none" }}>

@@ -161,31 +161,34 @@ export default function Stake({ address }) {
           Wallet Balance: <b>{balance} BYTA</b>
         </div>
 
-       <input
+      <input
   value={stakeAmount}
   onChange={(e) => setStakeAmount(e.target.value)}
   placeholder="Enter stake amount"
-  style={{
-    width: "100%",
-    padding: "12px",
-    marginTop: 8,
-    borderRadius: 10
-  }}
+  className="stake-input"
 />
 
 
-        <div style={{ display: "flex", gap: 8, marginTop: 8 }}>
+
+        <div
+         style={{
+         display: "flex",
+         gap: 8,
+         marginTop: 8,
+         flexWrap: "wrap"
+      }}
+      >
           {[25, 50, 75].map((p) => (
             <button
               key={p}
-              className="btn btn-secondary"
+              className="btn btn-secondary btn-percent"
               onClick={() => handleStakePercent(p)}
             >
               {p}%
             </button>
           ))}
           <button
-            className="btn btn-secondary"
+            className="btn btn-secondary btn-percent"
             onClick={() => handleStakePercent(100)}
           >
             MAX
@@ -213,48 +216,49 @@ export default function Stake({ address }) {
           Staked Balance: <b>{stakedBalance} BYTA</b>
         </div>
 
-       <input
+      <input
   value={unstakeAmount}
   onChange={(e) => setUnstakeAmount(e.target.value)}
   placeholder="Enter unstake amount"
-  style={{
-    width: "100%",
-    padding: "12px",
-    marginTop: 8,
-    borderRadius: 10
-  }}
+  className="stake-input"
 />
 
 
-        <div style={{ display: "flex", gap: 8, marginTop: 8 }}>
+
+        <div
+          style={{
+          display: "flex",
+          gap: 8,
+          marginTop: 8,
+          flexWrap: "wrap"
+        }}
+   >
+
           {[25, 50, 75].map((p) => (
             <button
               key={p}
-              className="btn btn-secondary"
+              className="btn btn-secondary btn-percent"
               onClick={() => handleUnstakePercent(p)}
             >
               {p}%
             </button>
           ))}
           <button
-            className="btn btn-secondary"
+            className="btn btn-secondary btn-percent"
             onClick={() => handleUnstakePercent(100)}
           >
             MAX
           </button>
         </div>
 
-      <button
-  className="btn"
+     <button
+  className="btn btn-primary"
   style={{
     marginTop: 8,
-    padding: "12px 22px",
-    borderRadius: 12,
-    background: "#f80606",
-    color: "#fff",
-    fontWeight: 600,
-    border: "none"
+    padding: "12px 20px",
+    borderRadius: 12
   }}
+
   onClick={handleUnstake}
 >
   Unstake

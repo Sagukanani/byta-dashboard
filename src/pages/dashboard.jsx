@@ -43,7 +43,7 @@ function copyText(text) {
   navigator.clipboard.writeText(text);
 }
 
-export default function Dashboard({ address }) {
+export default function Dashboard({ address, onNavigate }) {
   const [loading, setLoading] = useState(true);
   const [claimStatus, setClaimStatus] = useState("");
 
@@ -326,28 +326,20 @@ if (!address) {
         </Box>
       </div>
 
-     {/* 🔒 LOCKED SUMMARY */}
-<div className="stat-grid section">
- <Box title="🔒 Locked Summary">
-  {/* 🔲 TWO COLUMN LAYOUT */}
-  <div
-    style={{
-      display: "grid",
-      gridTemplateColumns: "1fr auto",
-      gap: 20,
-      alignItems: "flex-start"
-    }}
-  >
+    {/* 🔒 LOCKED SUMMARY */}
+<Box title="🔒 Locked Summary">
+
+  <div className="locked-summary-grid">
+
     {/* ⬅️ LEFT SIDE */}
     <div>
       <div className="value accent-green">
         {formatNumber(lockedSummary.totalLocked)} BYTA
       </div>
 
-      {/* ACTIVE LOCKS */}
       <div style={{ marginTop: 6 }}>
         <b>Active Locks:</b>
-        <div style={{ display: "flex", gap: 8, marginTop: 6 }}>
+        <div style={{ display: "flex", gap: 8, marginTop: 6, flexWrap: "wrap" }}>
           {Array.from({ length: lockedSummary.activeLocks }).map((_, i) => (
             <button
               key={i}
@@ -360,7 +352,7 @@ if (!address) {
                   selectedLockIndex === i ? "#e62806f0" : "#070404ff",
                 color: "#fff",
                 border: "1px solid #333",
-                fontSize: 13
+                fontSize: 13,
               }}
             >
               Lock {i + 1}
@@ -370,90 +362,52 @@ if (!address) {
       </div>
     </div>
 
-   {/* ➡️ RIGHT SIDE (ACTION AREA) */}
-<div
-  style={{
-    display: "flex",
-    flexDirection: "column",
-    alignItems: "flex-end",
-    gap: 10,
-    minWidth: 240
-  }}
+    {/* ➡️ RIGHT SIDE (ALWAYS SAME PLACE) */}
+    <div className="lock-action-area">
+      <button
+  className="btn btn-primary"
+  onClick={() => onNavigate("longterm")}
 >
-  <button
-    className="btn btn-primary"
-    style={{
-      padding: "12px 20px",
-      borderRadius: 12,
-      fontWeight: 600
-    }}
-    disabled={
-      !selectedLock ||
-      Number(lockedSummary.pendingReward) === 0
-    }
-    onClick={handleClaimLockReward}
-  >
-    🔓 Claim Lock Reward
-  </button>
+  🔓 Claim
+</button>
 
-  {/* ✅ PENDING LOCK REWARD — JUST BELOW BUTTON */}
-  <div
-    style={{
-      fontSize: 13,
-      color: "#aaaaaaff",
-      textAlign: "right"
-    }}
-  >
-    Pending Lock Reward:{" "}
-    <span style={{ color: "#ff3b3b", fontWeight: 600 }}>
-      {formatNumber(lockedSummary.pendingReward, 6)} BYTA
-    </span>
+
+      <div className="lock-reward-text">
+        🔒 {formatNumber(lockedSummary.pendingReward, 6)} BYTA
+      </div>
+    </div>
+
   </div>
-</div>
-  </div>
-  {/* 🔍 SELECTED LOCK DETAILS (FULL WIDTH BELOW) */}
+
+  {/* 🔽 SELECTED LOCK DETAILS (FULL WIDTH BELOW) */}
   {selectedLock && (
-  <div
-    style={{
-      marginTop: 12,
-      padding: 12,
-      borderRadius: 10,
-      background: "#070404ff",
-      border: "1px solid #333",
-      fontSize: 13
-    }}
-  >
-    <div><b>Selected Lock:</b> #{selectedLockIndex + 1}</div>
-
-    <div>
-      <b>Amount:</b>{" "}
-      {(Number(selectedLock.amount) / 1e18).toFixed(6)} BYTA
+    <div
+      style={{
+        marginTop: 12,
+        padding: 12,
+        borderRadius: 10,
+        background: "#070404ff",
+        border: "1px solid #333",
+        fontSize: 13,
+      }}
+    >
+      <div><b>Selected Lock:</b> #{selectedLockIndex + 1}</div>
+      <div><b>Amount:</b> {(Number(selectedLock.amount) / 1e18).toFixed(6)} BYTA</div>
+      <div><b>Lock Period:</b> {selectedLock.lockMonths} months</div>
+      <div><b>Auto Renew:</b> {selectedLock.autoRenewCount > 0 ? "Yes" : "No"}</div>
+      <div style={{ marginTop: 6 }}>
+        <b>Time Left:</b>{" "}
+        <span style={{ color: "#f5a623" }}>
+          {formatTimeLeft(
+            Number(selectedLock.end) - Math.floor(Date.now() / 1000)
+          )}
+        </span>
+      </div>
     </div>
-
-    <div>
-      <b>Lock Period:</b> {selectedLock.lockMonths} months
-    </div>
-
-    <div>
-      <b>Auto Renew:</b>{" "}
-      {selectedLock.autoRenewCount > 0 ? "Yes" : "No"}
-    </div>
-
-    {/* ⏳ COUNTDOWN TIMER */}
-    <div style={{ marginTop: 6 }}>
-      <b>Time Left:</b>{" "}
-      <span style={{ color: "#f5a623" }}>
-        {formatTimeLeft(
-  Number(selectedLock.end) - Math.floor(Date.now() / 1000)
-)}
-      </span>
-    </div>
-  </div>
-)}
+  )}
 
 </Box>
 
-</div>
 
 
       {/* REFERRAL LINKS */}
