@@ -67,17 +67,18 @@ async function handleConnect() {
      
 
 {/* 🌍 FLAG BUTTON */}
-<div
-  style={{
-    position: "fixed",
-    top: 20,
-    right: 170,        // 👈 wallet se thoda left
-    zIndex: 9999,
-    pointerEvents: "auto"
-  }}
->
-  <FlagButton />
-</div>
+{!walletMenuOpen && (
+  <div
+    style={{
+      position: "fixed",
+      top: 20,
+      right: 140,
+      zIndex: 40
+    }}
+  >
+    <FlagButton />
+  </div>
+)}
 
 
 
@@ -106,7 +107,7 @@ async function handleConnect() {
 >
 
     {wallet.connected
-      ? wallet.address.slice(0, 6) + "..." + wallet.address.slice(-4)
+      ? wallet.address.slice(0, 3) + "..." + wallet.address.slice(-4)
       : "Connect Wallet"}
   </button>
 
