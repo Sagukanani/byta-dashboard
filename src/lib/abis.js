@@ -202,7 +202,18 @@ export const STAKING_ABI = [
   ],
   "stateMutability": "view",
   "type": "function"
+},
+{
+  "inputs": [
+    { "internalType": "address", "name": "ref", "type": "address" },
+    { "internalType": "bool", "name": "isLeft", "type": "bool" }
+  ],
+  "name": "setReferrer",
+  "outputs": [],
+  "stateMutability": "nonpayable",
+  "type": "function"
 }
+
 
 
 
