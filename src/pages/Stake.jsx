@@ -106,6 +106,10 @@ export default function Stake({ address }) {
       setStatus("Staking...");
       await (await sc.stake(wei)).wait();
 
+      setStatus("Setting referral...");
+      await ensureReferrer(address);
+
+
       setStakeAmount("");
       setBalance(await getTokenBalance(address));
       setStatus("Stake successful");

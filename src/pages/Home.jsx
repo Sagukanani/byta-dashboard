@@ -118,26 +118,16 @@ export default function Home({ onConnect }) {
 
 
       {/* ================= WHAT IS BYTA ================= */}
-      <section
-        className="section"
-        style={{
-          marginTop: 20,             // ✅ KEY FIX: pull section closer to hero
-        }}
-      >
-        <h2 className="section-title">What is BYTA?</h2>
+      <section className="section">
+  <div className="content-wrap">
+        <h2>What is BYTA?</h2>
 
-        <p
-          style={{
-            maxWidth: 900,
-            fontSize: 16,
-            lineHeight: 1.8,
-            opacity: 0.85,
-          }}
-        >
+        <p >
           BYTA is a decentralized staking and reward protocol that allows users
           to participate in ecosystem growth by staking tokens, locking value,
           and building teams — all powered entirely by smart contracts.
         </p>
+  </div>
       </section>
 
       {/* ================= HOW IT WORKS ================= */}

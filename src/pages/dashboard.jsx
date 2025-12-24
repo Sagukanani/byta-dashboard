@@ -243,14 +243,19 @@ if (!address) {
   );
 }
 
-  return (
-    <div className="main-container">
+return (
+  <div className="main-container">
+    <div className="content-wrap">
+
       <h1>Dashboard</h1>
+    
 
       
 
+      
       {/* TOP GRID */}
-      <div className="stat-grid section">
+<div className="section dashboard-stack">
+
         <Box title="Token Balance">
           <div className="value accent-purple">
             {formatNumber(tokenBalance)} BYTA
@@ -294,10 +299,12 @@ if (!address) {
 
           {claimStatus && <div className="sub-value">{claimStatus}</div>}
         </Box>
-      </div>
+      
 
       {/* REWARDS */}
-      <div className="stat-grid section">
+
+
+
         <Box title="Pending Staking Reward">
           <div className="value">{formatNumber(stakingUsd)} USD</div>
           <div className="sub-value">
@@ -324,7 +331,7 @@ if (!address) {
         <Box title="Referral Income">
           <div className="value">{formatNumber(referralIncome)} BYTA</div>
         </Box>
-      </div>
+      
 
     {/* 🔒 LOCKED SUMMARY */}
 <Box title="🔒 Locked Summary">
@@ -410,6 +417,7 @@ if (!address) {
 
 
 
+
       {/* REFERRAL LINKS */}
       <div className="section">
         <h2>Referral Links</h2>
@@ -456,8 +464,12 @@ if (!address) {
         </div>
       </div>
     </div>
+  </div>
+  
+  </div>
   );
 }
+
 
 /* ---------- UI COMPONENT ---------- */
 function Box({ title, children }) {
@@ -466,5 +478,6 @@ function Box({ title, children }) {
       <div className="label">{title}</div>
       {children}
     </div>
+
   );
 }

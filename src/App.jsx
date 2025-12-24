@@ -71,14 +71,14 @@ async function handleConnect() {
   style={{
     position: "fixed",
     top: 20,
-    right: 120,
-    left: 380,
-    zIndex: 9999,          // 🔥 VERY IMPORTANT
-    pointerEvents: "auto" // 🔥 CLICK ENABLE
+    right: 170,        // 👈 wallet se thoda left
+    zIndex: 9999,
+    pointerEvents: "auto"
   }}
 >
   <FlagButton />
 </div>
+
 
 
  {/* 💼 WALLET BUTTON */}
@@ -212,7 +212,8 @@ async function handleConnect() {
 )}
 
       {/* MAIN CONTENT – UNCHANGED */}
-     <div style={{ padding: "80px 20px" }}>
+    <div className="app-content">
+
 
       <div style={{ display: page === "home" ? "block" : "none" }}>
        <Home onStart={() => setPage("dashboard")} />

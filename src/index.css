@@ -41,14 +41,7 @@ body{
   color: var(--text-main);
   font-family: Inter, system-ui, -apple-system, Segoe UI, Roboto, Arial;
 }
-/* =========================
-   LAYOUT
-========================= */
-.main-container{
-  width: 100%;
-  margin: 0;
-  padding: 0;
-}
+
 
 /* =========================
    HEADINGS
@@ -95,15 +88,7 @@ h2{
   border: none;
 }
 
-/* =========================
-   STAT GRID
-========================= */
-.stat-grid{
-  display: grid;
-  grid-template-columns: repeat(auto-fit, minmax(260px,1fr));
-  gap: 22px;
-  margin-top: 24px;
-}
+
 
 /* =========================
    TEXT HELPERS
@@ -361,11 +346,7 @@ input::placeholder{
     gap: 16px;
   }
 
-  /* Prevent cards touching screen edges */
-  .main-container{
-    padding-left: 14px;
-    padding-right: 14px;
-  }
+ 
 }
 /* =========================
    ADDRESS / LINK SAFETY
@@ -499,3 +480,88 @@ h1, h2, p {
   left: 0;
   top: 0;
 }
+
+/* ===============================
+   MOBILE LAYOUT FIX ONLY
+   =============================== */
+@media (max-width: 640px){
+  body{
+    background: #323131ff;   /* same as app bg */
+  }
+}
+
+.app-content {
+  padding: 80px 20px;
+}
+
+/* MOBILE: let container handle spacing */
+@media (max-width: 640px) {
+  .app-content {
+    padding: 80px 0;
+  }
+}
+
+/* ===============================
+   BYTA ABOUT TEXT – MOBILE ONLY
+   =============================== */
+@media (max-width: 640px) {
+
+  /* BYTA section wrapper (safe generic) */
+  .section {
+    padding-left: 20px;
+    padding-right: 20px;
+  }
+
+  /* Paragraph text improvement */
+  .section p {
+    text-align: left;          /* 🔥 Origin style */
+    font-size: 14px;
+    line-height: 1.7;
+    color: rgba(255,255,255,0.82);
+    max-width: 100%;
+    word-break: normal;        /* 🔥 stop ugly breaks */
+    overflow-wrap: normal;
+    hyphens: none;
+  }
+
+  /* BYTA heading spacing */
+  .section h2 {
+    text-align: left;
+    margin-bottom: 12px;
+  }
+}
+
+
+
+/* Mobile safety */
+@media (max-width: 768px) {
+  .content-wrap {
+    padding-left: 14px;
+    padding-right: 14px;
+  }
+}
+
+/* ===== UNIVERSAL CONTENT WIDTH (HOME + DASHBOARD) ===== */
+
+.content-wrap {
+  max-width: 900px;
+  margin-left: auto;
+  margin-right: auto;
+  width: 91%;
+  padding-left: 0px;
+  padding-right: 38px;
+}
+
+/* dashboard cards stack */
+.dashboard-stack {
+  display: flex;
+  flex-direction: column;
+  gap: 18px;
+}
+
+.dashboard-stack .card {
+  width: 100%;
+}
+
+
+

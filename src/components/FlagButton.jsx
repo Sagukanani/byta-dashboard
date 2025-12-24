@@ -65,18 +65,25 @@ export default function FlagButton() {
 
       {/* DROPDOWN */}
       {open && (
-        <div
-          style={{
-            position: "absolute",
-            top: 46,
-            right: 0,
-            background: "#353535ff",
-            borderRadius: 10,
-            border: "1px solid #474748ff",
-            padding: 6,
-            zIndex: 100
-          }}
-        >
+       <div
+  style={{
+    position: "absolute",
+    top: "110%",
+    left: "50%",
+    transform: "translateX(-50%)",
+    background: "#2b2b2b",
+    borderRadius: 18,
+    border: "1px solid #3a3a3a",
+    padding: "8px 6px",
+    display: "flex",
+    flexDirection: "column",
+    alignItems: "center",
+    gap: 10,
+    boxShadow: "0 10px 30px rgba(0,0,0,0.45)",
+    zIndex: 100
+  }}
+>
+
           {FLAGS.map((f) => (
             <div
               key={f.code}
@@ -85,23 +92,22 @@ export default function FlagButton() {
                 setOpen(false);
               }}
               style={{
-                display: "flex",
-                alignItems: "center",
-                gap: 8,
-                padding: "6px 10px",
-                cursor: "pointer"
-              }}
-            >
+    width: 34,
+    height: 24,
+    display: "flex",
+    alignItems: "center",
+    justifyContent: "center",
+    cursor: "pointer"
+  }}
+>
               <img
                 src={f.url}
                 alt={f.name}
-                width={20}
-                height={14}
+                width={22}
+                height={16}
                 style={{ borderRadius: 2 }}
               />
-              <span style={{ fontSize: 13, color: "#fff" }}>
-                {f.name}
-              </span>
+              
             </div>
           ))}
         </div>
